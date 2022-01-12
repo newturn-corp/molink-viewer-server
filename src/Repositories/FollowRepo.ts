@@ -1,4 +1,4 @@
-import Follow from '../domain/Follow'
+import Follow from '../Domains/Follow'
 import BaseRepo from './BaseRepo'
 
 class FollowerRepo extends BaseRepo {

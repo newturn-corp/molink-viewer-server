@@ -10,7 +10,7 @@ dotenv.config()
 const app = express()
 useMiddleware(app)
 app.listen(env.port, () => {
-    console.log('knowlink-server-start')
+    console.log(`knowlink-viewer start at ${env.port}`)
 })
 
 export default app

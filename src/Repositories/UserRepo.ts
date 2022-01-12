@@ -1,5 +1,5 @@
-import User from '../domain/User'
-import { UserWithProfileDTO } from '../Dtos/UserDTO'
+import User from '../Domains/User'
+import { UserWithProfileDTO } from '../DTO/UserDTO'
 import { DateUtil } from '../utils/DateUtil'
 import BaseRepo from './BaseRepo'
 

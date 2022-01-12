@@ -1,15 +1,16 @@
 import { RoutingControllersOptions } from 'routing-controllers'
+import DocumentController from '../Controllers/documents'
 import MainController from '../Controllers/main'
 
 import { AuthMiddleware } from '../Middlewares/AuthMiddleware'
 import { CustomErrorHandler } from '../Middlewares/CustomErrorHandler'
 
 const routingControllersOptions: RoutingControllersOptions = {
-    routePrefix: '/api',
     defaultErrorHandler: false,
     middlewares: [CustomErrorHandler],
     controllers: [
-        MainController
+        MainController,
+        DocumentController
     ],
     authorizationChecker: AuthMiddleware.authorization,
     currentUserChecker: AuthMiddleware.currentUser

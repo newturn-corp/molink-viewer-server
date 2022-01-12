@@ -1,7 +1,7 @@
 import { ValidationError } from 'class-validator'
 import express from 'express'
 import { ExpressErrorMiddlewareInterface, HttpError, Middleware, UnauthorizedError } from 'routing-controllers'
-import { ResponseMessage } from '../Dtos/Common'
+import { ResponseMessage } from '../DTO/Common'
 import env from '../env'
 import { CustomErrorWithSlackNotification } from '../Errors/Common'
 import { CustomHttpError } from '../Errors/HttpError'

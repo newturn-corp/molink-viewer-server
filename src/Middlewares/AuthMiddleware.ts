@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { Action, UnauthorizedError } from 'routing-controllers'
 import env from '../env'
 import { JWTUser } from '../Types/JWTUser'
-import UserRepo from '../repo/UserRepo'
+import UserRepo from '../Repositories/UserRepo'
 export class AuthMiddleware {
     static async authorization (action: Action) {
         const { token } = action.request.cookies
