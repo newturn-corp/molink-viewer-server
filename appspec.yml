@@ -1,0 +1,35 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/knowlink-viewer
+permissions:
+  - object: /home/ubuntu/knowlink-viewer
+    owner: ubuntu
+hooks:
+  ApplicationStop:
+  BeforeInstall:
+    - location: infra/scripts/installRuntimePackages.sh
+    - location: infra/scripts/setUpDirectories.sh
+      runas: ubuntu
+  AfterInstall:
+    - location: infra/scripts/setUpPm2Logrotate.sh
+      runas: ubuntu
+    - location: infra/scripts/installNodePackages.sh
+      runas: ubuntu
+    - location: infra/scripts/buildTsRuntime.sh
+      runas: ubuntu
+    - location: infra/scripts/loadParametersFromAWSSSM.sh
+      runas: ubuntu
+  ApplicationStart:
+    - location: infra/scripts/runServer.sh 
+      runas: ubuntu
+  ValidateService:
+  BeforeAllowTraffic:
+  AfterAllowTraffic:
+  BeforeBlockTraffic:
+  AfterBlockTraffic:
+    - location: infra/scripts/zipLogs.sh
+      runas: ubuntu
+    - location: infra/scripts/uploadLogZip.sh
+      runas: ubuntu
