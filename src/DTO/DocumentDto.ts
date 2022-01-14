@@ -1,7 +1,7 @@
 import { DocumentVisibility } from '../Domains/Document'
 import DocumentAuthority from '../Domains/DocumentAuthority'
 
-export class GetDocumentResponseDTO {
+export class GetDocumentViewInfoResponseDTO {
     id: string = ''
     title: string = ''
     icon: string = ''
@@ -10,10 +10,27 @@ export class GetDocumentResponseDTO {
     createdAt: Date = new Date()
     updatedAt: Date = new Date()
     authority: DocumentAuthority
-
     content: any = null
 
     constructor (authority: DocumentAuthority) {
         this.authority = authority
+    }
+}
+
+export class DocumentHierarchyDTO {
+    id: string
+    title: string
+    icon: string
+    order: number
+    parentId: string | null
+    isChildrenOpen: boolean
+
+    constructor (id: string, title: string, icon: string, order: number, parentId: string | null, isChildrenOpen: boolean) {
+        this.id = id
+        this.title = title
+        this.icon = icon
+        this.order = order
+        this.parentId = parentId
+        this.isChildrenOpen = isChildrenOpen
     }
 }

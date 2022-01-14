@@ -1,3 +1,4 @@
+import dynamo from '../utils/dynamo'
 import query from '../utils/queryBuilder'
 
 export default class BaseRepo {
@@ -47,5 +48,14 @@ export default class BaseRepo {
             const [rows] = await conn.query(queryString, args)
             return rows.length !== 0
         })
+    }
+
+    async _selectItemsByKey (tableName: string, conditionString: string, args: any = {}, columns = undefined, limit = undefined, ascending = true) {
+        const result = await dynamo.query(tableName, conditionString, args, columns, limit, ascending)
+        return result
+    }
+
+    async _insertToDynamo (tableName: string, item: any) {
+        await dynamo.putItem(tableName, item)
     }
 }

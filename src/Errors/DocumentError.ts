@@ -11,3 +11,7 @@ export class DocumentOnlyOpenedForFollower extends CustomError {}
 export class DocumentNotExist extends CustomError {}
 
 export class InvalidAuthorityOfDocumentAction extends CustomError {}
+
+export class HierarchyUserNotExists extends CustomError {}
+
+export class DocumentHierarchyInfoNotMatching extends CustomError {}

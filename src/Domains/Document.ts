@@ -14,32 +14,24 @@ export default class Document {
     userId: number
     title: string
     icon: string
-    order: number
-    isChildrenOpen: boolean
-    parentId: string | null
-    children: Document[] = []
     visibility: DocumentVisibility
     createdAt: Date
     updatedAt: Date
-    contentId: string
-    representative: boolean
-    selection: DocumentSelection | null
-    isLocked: boolean
 
-    constructor (id: string, userId: number, title: string, icon: string, order: number, isChildrenOpen: boolean, parentId: string | null, visibility: DocumentVisibility, createdAt: Date, updatedAt: Date, contentId: string, representative: boolean, selection: DocumentSelection | null, isLocked: boolean) {
+    contentId: string
+    editionInfoId: string
+    hierarchyInfoId: string
+
+    constructor (id: string, userId: number, title: string, icon: string, visibility: DocumentVisibility, createdAt: Date, updatedAt: Date, contentId: string, editionInfoId: string, hierarchyInfoId: string) {
         this.id = id
         this.userId = userId
         this.title = title
         this.icon = icon
-        this.order = order
-        this.isChildrenOpen = isChildrenOpen
-        this.parentId = parentId
         this.visibility = visibility
         this.createdAt = createdAt
         this.updatedAt = updatedAt
         this.contentId = contentId
-        this.representative = representative
-        this.selection = selection
-        this.isLocked = isLocked
+        this.editionInfoId = editionInfoId
+        this.hierarchyInfoId = hierarchyInfoId
     }
 }
