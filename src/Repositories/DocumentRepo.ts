@@ -57,7 +57,7 @@ class DocumentRepo extends BaseRepo {
 
     async getDocumentChildrenOpen (documentId: string, viewerId: number): Promise<DocumentChildrenOpen | undefined> {
         const tableName = `molink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
-        const conditionString = 'documentId = :documentId AND viewerId = :viewerId AND is_open = true'
+        const conditionString = 'documentId = :documentId AND viewerId = :viewerId AND isOpen = true'
         const args = {
             ':documentId': documentId,
             ':viewerId': viewerId
@@ -71,7 +71,7 @@ class DocumentRepo extends BaseRepo {
 
     async getDocumentChildrenOpenListByUserIdAndViewerId (userId: number, viewerId: number): Promise<DocumentChildrenOpen[]> {
         const tableName = `molink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
-        const conditionString = 'userId = :userId AND viewerId = :viewerId AND is_open = true'
+        const conditionString = 'userId = :userId AND viewerId = :viewerId AND isOpen = true'
         const args = {
             ':userId': userId,
             ':viewerId': viewerId
