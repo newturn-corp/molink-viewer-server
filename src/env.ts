@@ -31,6 +31,10 @@ const env = {
         token: process.env.SLACK_BOT_TOKEN!
     },
     redis: {
+        live: {
+            host: process.env.LIVE_REDIS_HOST!,
+            port: Number(process.env.LIVE_REDIS_PORT) || 6379
+        },
         host: process.env.REDIS_HOST!,
         port: Number(process.env.REDIS_PORT) || 6379
     },

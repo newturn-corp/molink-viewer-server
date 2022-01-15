@@ -8,6 +8,7 @@ import ContentRepo from '../Repositories/ContentRepo'
 import DocumentRepo from '../Repositories/DocumentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
 import UserRepo from '../Repositories/UserRepo'
+import CacheService from './CacheService'
 
 class DocumentService {
     checkUserDocumentViewable (user: User, document: Document, isFollower: boolean) {
@@ -84,6 +85,17 @@ class DocumentService {
         if (!user) {
             throw new HierarchyUserNotExists()
         }
+
+        if (viewer.nickname === user.nickname) {
+            // 캐싱되어있다면 캐싱된 정보를 리턴함
+            const hierarchy = await CacheService.liveRedis.hgetall(`hierarchy-${nickname}`)
+            const documents = []
+            for (const documentId in hierarchy) {
+                documents.push(JSON.parse(hierarchy[documentId]) as DocumentHierarchyDTO)
+            }
+            return documents
+        }
+
         const rawDocumentHierarchyInfoList = await DocumentRepo.getDocumentHierarchyInfoListByUserId(user.id)
         if (!rawDocumentHierarchyInfoList) {
             return []
@@ -102,7 +114,7 @@ class DocumentService {
         const isFollower = await this.checkIsFollower(user.id, viewer.id)
 
         const rawDocuments = await DocumentRepo.getDocumentsByUserId(user.id)
-        return rawDocuments
+        const documents = rawDocuments
             .filter(document => this.checkUserDocumentViewable(viewer, document, isFollower))
             .map(raw => {
                 const hierarchyInfo = hierarchyInfoMap.get(raw.hierarchyInfoId)
@@ -111,6 +123,15 @@ class DocumentService {
                 }
                 return new DocumentHierarchyDTO(raw.id, raw.title, raw.icon, hierarchyInfo.order, hierarchyInfo.parentId, childrenOpenMap.has(raw.id))
             })
+
+        // 캐싱하기
+        if (viewer.nickname === user.nickname) {
+            await CacheService.liveRedis.hmset(`hierarchy-${nickname}`, documents.reduce((prev: DocumentHierarchyDTO, current: DocumentHierarchyDTO) => {
+                (prev as any)[current.id] = JSON.stringify(current)
+                return prev
+            }, {} as any))
+        }
+        return documents
     }
 
     async getDocumentHierarchyInfo (viewer: User, documentId: string) {

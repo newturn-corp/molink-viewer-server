@@ -4,14 +4,14 @@ import env from '../env'
 
 import Slack from './Slack'
 
-class RedisConnector {
+export default class RedisConnector {
     private _client: Redis.Redis
     private _connectionState: boolean = false
 
-    constructor () {
+    constructor (host: string, port: number) {
         this._client = new Redis({
-            host: env.redis.host,
-            port: env.redis.port,
+            host,
+            port,
             showFriendlyErrorStack: true,
             enableReadyCheck: true,
             lazyConnect: true,
@@ -92,6 +92,11 @@ class RedisConnector {
         return this._connectionState
     }
 
+    async get (key: Redis.KeyType) {
+        const result = await this._client.get(key)
+        return result
+    }
+
     async setNxWithEx (key: Redis.KeyType, value: Redis.ValueType, ttl: number) {
         const result = await this._client.setnx(key, value)
         if (result === 0) {
@@ -135,6 +140,12 @@ class RedisConnector {
     async del (key: Redis.KeyType) {
         return this._client.del(key)
     }
-}
 
-export default new RedisConnector()
+    async hmset (key: Redis.KeyType, value: any) {
+        return this._client.hmset(key, value)
+    }
+
+    async hgetall (key: Redis.KeyType) {
+        return this._client.hgetall(key)
+    }
+}
