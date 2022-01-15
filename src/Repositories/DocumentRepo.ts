@@ -38,7 +38,7 @@ class DocumentRepo extends BaseRepo {
         const args = {
             ':userId': userId
         }
-        const items = await this._selectItemsByKey(`knowlink-document-hierarchy-info-${tableName}-table`, conditionString, args)
+        const items = await this._selectItemsByKey(`molink-document-hierarchy-info-${tableName}-table`, conditionString, args)
         return items as DocumentHierarchyInfo[]
     }
 
@@ -56,7 +56,7 @@ class DocumentRepo extends BaseRepo {
     }
 
     async getDocumentChildrenOpen (documentId: string, viewerId: number): Promise<DocumentChildrenOpen | undefined> {
-        const tableName = `knowlink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
+        const tableName = `molink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
         const conditionString = 'documentId = :documentId AND viewerId = :viewerId AND open = true'
         const args = {
             ':documentId': documentId,
@@ -70,7 +70,7 @@ class DocumentRepo extends BaseRepo {
     }
 
     async getDocumentChildrenOpenListByUserIdAndViewerId (userId: number, viewerId: number): Promise<DocumentChildrenOpen[]> {
-        const tableName = `knowlink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
+        const tableName = `molink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
         const conditionString = 'userId = :userId AND viewerId = :viewerId AND open = true'
         const args = {
             ':userId': userId,
