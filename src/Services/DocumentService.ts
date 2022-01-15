@@ -91,8 +91,11 @@ class DocumentService {
             const cachedHierarchy = await CacheService.liveRedis.hgetall(`hierarchy-${user.id}-${viewer.id}`)
             if (Object.keys(cachedHierarchy).length > 0) {
                 const documents = []
-                for (const documentId in cachedHierarchy) {
-                    documents.push(JSON.parse(cachedHierarchy[documentId]) as DocumentHierarchyDTO)
+                for (const key in cachedHierarchy) {
+                    if (key === 'updatedAt') {
+                        continue
+                    }
+                    documents.push(JSON.parse(cachedHierarchy[key]) as DocumentHierarchyDTO)
                 }
                 return documents
             }
@@ -134,7 +137,9 @@ class DocumentService {
             await CacheService.liveRedis.hmset(`hierarchy-${user.id}-${viewer.id}`, documents.reduce((prev: DocumentHierarchyDTO, current: DocumentHierarchyDTO) => {
                 (prev as any)[current.id] = JSON.stringify(current)
                 return prev
-            }, {} as any))
+            }, {
+                updatedAt: new Date()
+            } as any))
         }
         return documents
     }
