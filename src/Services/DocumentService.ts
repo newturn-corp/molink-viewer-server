@@ -86,14 +86,16 @@ class DocumentService {
             throw new HierarchyUserNotExists()
         }
 
-        if (viewer.nickname === user.nickname) {
-            // 캐싱되어있다면 캐싱된 정보를 리턴함
-            const hierarchy = await CacheService.liveRedis.hgetall(`hierarchy-${nickname}`)
-            const documents = []
-            for (const documentId in hierarchy) {
-                documents.push(JSON.parse(hierarchy[documentId]) as DocumentHierarchyDTO)
+        // 캐싱되어있다면 캐싱된 정보를 리턴함
+        if (viewer) {
+            const cachedHierarchy = await CacheService.liveRedis.hgetall(`hierarchy-${user.id}-${viewer.id}`)
+            if (Object.keys(cachedHierarchy).length > 0) {
+                const documents = []
+                for (const documentId in cachedHierarchy) {
+                    documents.push(JSON.parse(cachedHierarchy[documentId]) as DocumentHierarchyDTO)
+                }
+                return documents
             }
-            return documents
         }
 
         const rawDocumentHierarchyInfoList = await DocumentRepo.getDocumentHierarchyInfoListByUserId(user.id)
@@ -105,11 +107,13 @@ class DocumentService {
             hierarchyInfoMap.set(info.id, info)
         })
 
-        const rawDocumentChildrenOpenList = await DocumentRepo.getDocumentChildrenOpenListByUserIdAndViewerId(user.id, viewer.id)
         const childrenOpenMap = new Map<string, boolean>()
-        rawDocumentChildrenOpenList.forEach(info => {
-            childrenOpenMap.set(info.documentId, true)
-        })
+        if (viewer) {
+            const rawDocumentChildrenOpenList = await DocumentRepo.getDocumentChildrenOpenListByUserIdAndViewerId(user.id, viewer.id)
+            rawDocumentChildrenOpenList.forEach(info => {
+                childrenOpenMap.set(info.documentId, true)
+            })
+        }
 
         const isFollower = await this.checkIsFollower(user.id, viewer.id)
 
@@ -121,12 +125,13 @@ class DocumentService {
                 if (!hierarchyInfo) {
                     throw new DocumentHierarchyInfoNotMatching()
                 }
-                return new DocumentHierarchyDTO(raw.id, raw.title, raw.icon, hierarchyInfo.order, hierarchyInfo.parentId, childrenOpenMap.has(raw.id))
+                const isChildrenOpen = viewer ? childrenOpenMap.has(raw.id) : false
+                return new DocumentHierarchyDTO(raw.id, raw.title, raw.icon, hierarchyInfo.order, hierarchyInfo.parentId, isChildrenOpen)
             })
 
         // 캐싱하기
-        if (viewer.nickname === user.nickname) {
-            await CacheService.liveRedis.hmset(`hierarchy-${nickname}`, documents.reduce((prev: DocumentHierarchyDTO, current: DocumentHierarchyDTO) => {
+        if (viewer) {
+            await CacheService.liveRedis.hmset(`hierarchy-${user.id}-${viewer.id}`, documents.reduce((prev: DocumentHierarchyDTO, current: DocumentHierarchyDTO) => {
                 (prev as any)[current.id] = JSON.stringify(current)
                 return prev
             }, {} as any))
