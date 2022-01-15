@@ -48,7 +48,7 @@ class DocumentRepo extends BaseRepo {
         const args = {
             ':id': id
         }
-        const items = await this._selectItemsByKey(`knowlink-document-hierarchy-info-${tableName}-table`, conditionString, args)
+        const items = await this._selectItemsByKey(`molink-document-hierarchy-info-${tableName}-table`, conditionString, args)
         if (!items) {
             return undefined
         }
