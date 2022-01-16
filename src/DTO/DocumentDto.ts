@@ -34,3 +34,23 @@ export class DocumentHierarchyDTO {
         this.isChildrenOpen = isChildrenOpen
     }
 }
+
+export class DocumentGeneralHierarchyInfo {
+    id: string
+    title: string
+    icon: string
+    userId: number
+    visiblity: DocumentVisibility
+    order: number
+    parentId: string | null
+
+    constructor (id: string, title: string, icon: string, userId: number, visiblity: DocumentVisibility, order: number, parentId: string | null) {
+        this.id = id
+        this.title = title
+        this.icon = icon
+        this.userId = userId
+        this.visiblity = visiblity
+        this.order = order
+        this.parentId = parentId
+    }
+}

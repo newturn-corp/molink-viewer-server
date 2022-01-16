@@ -4,7 +4,7 @@ import Document from '../Domains/Document'
 import BaseRepo from './BaseRepo'
 import env from '../env'
 import DocumentChildrenOpen from '../Domains/DocumentChildrenOpen'
-import DocumentHierarchyInfo from '../Domains/DocumentFilesystemInfo'
+import DocumentHierarchyInfo from '../Domains/DocumentHierarchyInfo'
 
 class DocumentRepo extends BaseRepo {
     rawSourceToDocument (id: string, source: any) {
