@@ -17,6 +17,7 @@
     "@aws-sdk/protocol-http": "^3.46.0",
     "@aws-sdk/signature-v4": "^3.46.0",
     "@slack/web-api": "^6.5.1",
+    "automerge": "^1.0.1-preview.6",
     "aws-sdk": "^2.1055.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

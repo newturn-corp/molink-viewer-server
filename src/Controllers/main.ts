@@ -29,8 +29,8 @@ export class MainController {
     @Get('/hierarchy/:nickname')
     async getDocumentHierarchyByNickname (@CurrentUser() user: User, @Param('nickname') nickname: string) {
         try {
-            const arr = await DocumentService.getHierarchy(user, nickname)
-            return makeResponseMessage(200, arr)
+            const data = await DocumentService.getHierarchy(user, nickname)
+            return makeResponseMessage(200, data)
         } catch (err) {
             if (err instanceof HierarchyUserNotExists) {
                 throw new CustomHttpError(404, 1, '유저가 존재하지 않습니다.')

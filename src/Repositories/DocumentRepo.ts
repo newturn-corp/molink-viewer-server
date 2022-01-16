@@ -8,7 +8,7 @@ import DocumentHierarchyInfo from '../Domains/DocumentHierarchyInfo'
 
 class DocumentRepo extends BaseRepo {
     rawSourceToDocument (id: string, source: any) {
-        return new Document(id, source.userId, source.title, source.icon, source.visibility, source.createdAt, source.updatedAt, source.contentId, source.editionInfoId, source.hierarchyInfoId)
+        return new Document(id, source.userId, source.title, source.icon, source.visibility, source.parentId, source.order, source.location, source.createdAt, source.updatedAt, source.contentId, source.editionInfoId)
     }
 
     async getDocument (id: string) {
