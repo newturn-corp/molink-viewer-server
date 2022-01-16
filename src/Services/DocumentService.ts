@@ -186,9 +186,7 @@ class DocumentService {
         // 캐싱되어있으면 Return
         const cache = await CacheService.liveRedis.get(`hierarchy-general-${user.id}`)
         if (cache) {
-            const serializedHierarchy = Uint8Array.from(JSON.parse(cache).data) as any
-            serializedHierarchy.__binaryDocument = true
-            return { serializedHierarchy }
+            return { serializedHierarchy: JSON.parse(cache).data }
         }
 
         const isFollower = await this.checkIsFollower(user.id, viewer.id)
@@ -223,8 +221,8 @@ class DocumentService {
 
         const serializedHierarchy = Automerge.save(hierarchy)
         await CacheService.liveRedis.set(`hierarchy-general-${user.id}`, JSON.stringify(Buffer.from(serializedHierarchy)))
-
-        return { serializedHierarchy }
+        console.log(serializedHierarchy)
+        return { serializedHierarchy: Array.from(serializedHierarchy) }
     }
 
     // async getDocumentHierarchyChildrenOpen (user: User, viewer: User) {
