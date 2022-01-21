@@ -221,7 +221,6 @@ class DocumentService {
 
         const serializedHierarchy = Automerge.save(hierarchy)
         await CacheService.liveRedis.set(`hierarchy-general-${user.id}`, JSON.stringify(Buffer.from(serializedHierarchy)))
-        console.log(serializedHierarchy)
         return { serializedHierarchy: Array.from(serializedHierarchy) }
     }
 

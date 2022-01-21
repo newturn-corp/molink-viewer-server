@@ -38,7 +38,7 @@ const env = {
         host: process.env.REDIS_HOST!,
         port: Number(process.env.REDIS_PORT) || 6379
     },
-    origin: process.env.FRONT_ORIGIN!
+    allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
 }
 
 const validateEnv = (data: Record<string, unknown> | null) => {

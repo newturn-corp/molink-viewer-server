@@ -16,7 +16,7 @@ export function useMiddleware (app: express.Application) {
         cors({
             credentials: true,
             preflightContinue: true,
-            origin: true
+            origin: env.allow_origin_list.split(',')
         })
     )
     morgan.token('date', () => {
