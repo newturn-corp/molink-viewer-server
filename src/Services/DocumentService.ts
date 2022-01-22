@@ -151,12 +151,19 @@ class DocumentService {
     }
 
     async getDocumentHierarchyChildrenOpenMap (viewer: User, nickname: string): Promise<GetHierarchyChildrenOpenDTO> {
+        if (!viewer) {
+            const serializedValue = Automerge.save(Automerge.from({
+                map: {},
+                lastUsedAt: new Date()
+            }))
+            return new GetHierarchyChildrenOpenDTO(Array.from(serializedValue))
+        }
+
         const user = await UserRepo.getActiveUserByNickname(nickname)
         if (!user) {
             throw new HierarchyUserNotExists()
         }
 
-        const childrenOpenMap = new Map<string, boolean>()
         // 캐싱되어있으면 Return
         const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyChildrenOpenRedis, `hierarchy-children-open-${user.id}-${viewer.id}`)
         if (cache) {

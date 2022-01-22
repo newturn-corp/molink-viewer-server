@@ -42,8 +42,7 @@ export class MainController {
         }
     }
 
-    @Authorized()
-    @Get('/hierarchy/:nickname/children-open-map')
+    @Get('/hierarchy/children-open-map/:nickname')
     async getDocumentHierarchyChildrenOpenMap (@CurrentUser() viewer: User, @Param('nickname') nickname: string) {
         try {
             const data = await DocumentService.getDocumentHierarchyChildrenOpenMap(viewer, nickname)
