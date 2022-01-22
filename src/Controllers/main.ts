@@ -1,4 +1,4 @@
-import { JsonController, Get, CurrentUser, Param } from 'routing-controllers'
+import { JsonController, Get, CurrentUser, Param, Authorized } from 'routing-controllers'
 import User from '../Domains/User'
 import { makeEmptyResponseMessage, makeResponseMessage } from '../DTO/Common'
 import { DocumentHierarchyInfoNotMatching, DocumentNotExist, HierarchyUserNotExists, UnauthorizedForDocument } from '../Errors/DocumentError'
@@ -30,6 +30,23 @@ export class MainController {
     async getDocumentHierarchyByNickname (@CurrentUser() user: User, @Param('nickname') nickname: string) {
         try {
             const data = await DocumentService.getHierarchy(user, nickname)
+            return makeResponseMessage(200, data)
+        } catch (err) {
+            if (err instanceof HierarchyUserNotExists) {
+                throw new CustomHttpError(404, 1, '유저가 존재하지 않습니다.')
+            } else if (err instanceof DocumentHierarchyInfoNotMatching) {
+                throw new CustomHttpError(400, 1, '예상치 못한 에러가 발생했습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Authorized()
+    @Get('/hierarchy/:nickname/children-open-map')
+    async getDocumentHierarchyChildrenOpenMap (@CurrentUser() viewer: User, @Param('nickname') nickname: string) {
+        try {
+            const data = await DocumentService.getDocumentHierarchyChildrenOpenMap(viewer, nickname)
             return makeResponseMessage(200, data)
         } catch (err) {
             if (err instanceof HierarchyUserNotExists) {

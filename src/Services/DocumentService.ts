@@ -11,6 +11,8 @@ import FollowerRepo from '../Repositories/FollowRepo'
 import UserRepo from '../Repositories/UserRepo'
 import { DocumentHierarchyBlock, Hierarchy } from '../Types/Hierarchy'
 import CacheService from './CacheService'
+import { GetHierarchyChildrenOpenDTO, HierarchyChildrenOpenInfoInterface } from '@newturn-develop/types-molink'
+import { getAutomergeDocumentFromRedis, setAutomergeDocumentAtRedis } from '@newturn-develop/molink-utils'
 
 class DocumentService {
     checkUserViewable (user: User, documentUserId: number, visibility: DocumentVisibility, isFollower: boolean) {
@@ -86,82 +88,6 @@ class DocumentService {
         return dto
     }
 
-    // async getDocumentGeneralHierarchyInfoList (user: User) {
-    //     // 캐싱되어있으면 Return
-    //     const cachedMap = await CacheService.liveRedis.hgetall(`hierarchy-general-${user.id}`)
-    //     if (Object.keys(cachedMap).length > 0) {
-    //         const infoList: DocumentGeneralHierarchyInfo[] = []
-    //         for (const key in cachedMap) {
-    //             if (key === 'lastUsedAt') {
-    //                 continue
-    //             }
-    //             infoList.push(JSON.parse(cachedMap[key]) as DocumentGeneralHierarchyInfo)
-    //         }
-    //         return infoList
-    //     }
-
-    //     const rawDocumentHierarchyInfoList = await DocumentRepo.getDocumentHierarchyInfoListByUserId(user.id)
-    //     if (!rawDocumentHierarchyInfoList) {
-    //         return []
-    //     }
-    //     const hierarchyInfoMap = new Map<string, DocumentHierarchyInfo>()
-    //     rawDocumentHierarchyInfoList.forEach(info => {
-    //         hierarchyInfoMap.set(info.id, info)
-    //     })
-    //     const rawDocuments = await DocumentRepo.getDocumentsByUserId(user.id)
-
-    //     const generalHierarchyInfoList = rawDocuments.map(document => {
-    //         const hierarchyInfo = hierarchyInfoMap.get(document.hierarchyInfoId)
-    //         if (!hierarchyInfo) {
-    //             throw new DocumentHierarchyInfoNotMatching()
-    //         }
-    //         return new DocumentGeneralHierarchyInfo(document.id, document.title, document.icon, document.userId, document.visibility, hierarchyInfo.order, hierarchyInfo.parentId)
-    //     })
-
-    //     // 캐싱하기
-    //     const hierarchy = Automerge.from<Hierarchy>({
-    //         map: generalHierarchyInfoList.reduce((prev: any, current: DocumentGeneralHierarchyInfo) => {
-    //             prev[current.id] = JSON.stringify(current)
-    //             return prev
-    //         }, { } as any),
-    //         lastUsedAt: new Date()
-    //     })
-    //     await CacheService.liveRedis.set(`hierarchy-general-${user.id}`, JSON.stringify(Automerge.save(hierarchy)))
-
-    //     return generalHierarchyInfoList
-    // }
-
-    async getDocumentChildrenOpenMap (user: User, viewer: User) {
-        const childrenOpenMap = new Map<string, boolean>()
-        if (viewer) {
-            // 캐싱되어있다면 캐싱된 것 리턴
-            const cachedMap = await CacheService.liveRedis.hgetall(`hierarchy-children-open-${user.id}-${viewer.id}`)
-            if (Object.keys(cachedMap).length > 0) {
-                for (const key in cachedMap) {
-                    if (key === 'lastUsedAt') {
-                        continue
-                    }
-                    childrenOpenMap.set(key, true)
-                }
-                return childrenOpenMap
-            }
-
-            const rawDocumentChildrenOpenList = await DocumentRepo.getDocumentChildrenOpenListByUserIdAndViewerId(user.id, viewer.id)
-            rawDocumentChildrenOpenList.forEach(info => {
-                childrenOpenMap.set(info.documentId, true)
-            })
-
-            // 캐싱해놓기
-            await CacheService.liveRedis.hmset(`hierarchy-children-open-${user.id}-${viewer.id}`, rawDocumentChildrenOpenList.reduce((prev: any, current: DocumentChildrenOpen) => {
-                prev[current.documentId] = 'true'
-                return prev
-            }, {
-                lastUsedAt: new Date()
-            } as any))
-        }
-        return childrenOpenMap
-    }
-
     sortAll (documentMap: Map<string, Document>, blocks: DocumentHierarchyBlock[]) {
         return blocks.map(block => {
             if (block.children.length < 2) {
@@ -224,55 +150,35 @@ class DocumentService {
         return { serializedHierarchy: Array.from(serializedHierarchy) }
     }
 
-    // async getDocumentHierarchyChildrenOpen (user: User, viewer: User) {
-    //     const childrenOpenMap = new Map<string, boolean>()
-    //     if (viewer) {
-    //         // 캐싱되어있다면 캐싱된 것 리턴
-    //         const cached = await CacheService.liveRedis.hgetall(`hierarchy-children-open-${user.id}-${viewer.id}`)
-    //         if (Object.keys(cachedMap).length > 0) {
-    //             for (const key in cachedMap) {
-    //                 if (key === 'lastUsedAt') {
-    //                     continue
-    //                 }
-    //                 childrenOpenMap.set(key, true)
-    //             }
-    //             return childrenOpenMap
-    //         }
+    async getDocumentHierarchyChildrenOpenMap (viewer: User, nickname: string): Promise<GetHierarchyChildrenOpenDTO> {
+        const user = await UserRepo.getActiveUserByNickname(nickname)
+        if (!user) {
+            throw new HierarchyUserNotExists()
+        }
 
-    //         const rawDocumentChildrenOpenList = await DocumentRepo.getDocumentChildrenOpenListByUserIdAndViewerId(user.id, viewer.id)
+        const childrenOpenMap = new Map<string, boolean>()
+        // 캐싱되어있으면 Return
+        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyChildrenOpenRedis, `hierarchy-children-open-${user.id}-${viewer.id}`)
+        if (cache) {
+            const serializedValue = Automerge.save(cache)
+            return new GetHierarchyChildrenOpenDTO(Array.from(serializedValue))
+        }
 
-    //         const obj = rawDocumentChildrenOpenList.reduce((prev: any, current: DocumentChildrenOpen) => {
-    //             prev[current.documentId] = 'true'
-    //             return prev
-    //         }, {
-    //             lastUsedAt: new Date()
-    //         } as any)
+        const rawDocumentChildrenOpenList = await DocumentRepo.getDocumentChildrenOpenListByUserIdAndViewerId(user.id, viewer.id)
 
-    //         // 캐싱해놓기
-    //         await CacheService.liveRedis.hmset(`hierarchy-children-open-${user.id}-${viewer.id}`, rawDocumentChildrenOpenList.reduce(obj)
-    //     }
-    //     return childrenOpenMap
-    // }
+        // 캐싱하기
+        const info = Automerge.from<HierarchyChildrenOpenInfoInterface>({
+            map: rawDocumentChildrenOpenList.reduce((prev: any, current: DocumentChildrenOpen) => {
+                prev[current.documentId] = 'true'
+                return prev
+            }, {
+            } as any),
+            lastUsedAt: new Date()
+        })
 
-    // async getDocumentHierarchyInfo (viewer: User, documentId: string) {
-    //     const document = await DocumentRepo.getDocument(documentId)
-    //     if (!document) {
-    //         throw new DocumentNotExist()
-    //     }
-
-    //     const isFollower = await this.checkIsFollower(document.userId, viewer.id)
-    //     if (!this.checkUserViewable(viewer, document.userId, document.visibility, isFollower)) {
-    //         throw new UnauthorizedForDocument()
-    //     }
-
-    //     const hierarchyInfo = await DocumentRepo.getDocumentHierarchyInfoListByID(document.hierarchyInfoId)
-    //     if (!hierarchyInfo) {
-    //         throw new DocumentHierarchyInfoNotMatching()
-    //     }
-
-    //     const rawDocumentChildrenOpen = await DocumentRepo.getDocumentChildrenOpen(documentId, viewer.id)
-
-    //     return new DocumentHierarchyDTO(document.id, document.title, document.icon, hierarchyInfo.order, hierarchyInfo.parentId, !!rawDocumentChildrenOpen)
-    // }
+        await setAutomergeDocumentAtRedis(CacheService.hierarchyChildrenOpenRedis, `hierarchy-children-open-${user.id}-${viewer.id}`, info)
+        const serializedValue = Automerge.save(info)
+        return new GetHierarchyChildrenOpenDTO(Array.from(serializedValue))
+    }
 }
 export default new DocumentService()
