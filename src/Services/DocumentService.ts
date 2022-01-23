@@ -165,7 +165,7 @@ class DocumentService {
         }
 
         // 캐싱되어있으면 Return
-        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyChildrenOpenRedis, `hierarchy-children-open-${user.id}-${viewer.id}`)
+        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyChildrenOpenRedis, `${user.id}-${viewer.id}`)
         if (cache) {
             const serializedValue = Automerge.save(cache)
             return new GetHierarchyChildrenOpenDTO(Array.from(serializedValue))
@@ -183,7 +183,7 @@ class DocumentService {
             lastUsedAt: new Date()
         })
 
-        await setAutomergeDocumentAtRedis(CacheService.hierarchyChildrenOpenRedis, `hierarchy-children-open-${user.id}-${viewer.id}`, info)
+        await setAutomergeDocumentAtRedis(CacheService.hierarchyChildrenOpenRedis, `${user.id}-${viewer.id}`, info)
         const serializedValue = Automerge.save(info)
         return new GetHierarchyChildrenOpenDTO(Array.from(serializedValue))
     }
