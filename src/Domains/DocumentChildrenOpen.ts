@@ -1,13 +1,9 @@
 export default class DocumentChildrenOpen {
+    itemKey: string
     documentId: string
-    userId: number
-    viewerId: number
-    open: boolean
 
-    constructor (documentId: string, userId: number, viewerId: number, open: boolean) {
+    constructor (itemKey: string, documentId: string) {
+        this.itemKey = itemKey
         this.documentId = documentId
-        this.userId = userId
-        this.viewerId = viewerId
-        this.open = open
     }
 }

@@ -4,7 +4,6 @@ import Document from '../Domains/Document'
 import BaseRepo from './BaseRepo'
 import env from '../env'
 import DocumentChildrenOpen from '../Domains/DocumentChildrenOpen'
-import DocumentHierarchyInfo from '../Domains/DocumentHierarchyInfo'
 
 class DocumentRepo extends BaseRepo {
     rawSourceToDocument (id: string, source: any) {
@@ -32,49 +31,11 @@ class DocumentRepo extends BaseRepo {
         }) as Document[]
     }
 
-    async getDocumentHierarchyInfoListByUserId (userId: number): Promise<DocumentHierarchyInfo[]> {
-        const tableName = env.isProduction ? 'production' : 'development'
-        const conditionString = 'userId = :userId'
-        const args = {
-            ':userId': userId
-        }
-        const items = await this._selectItemsByKey(`molink-document-hierarchy-info-${tableName}-table`, conditionString, args)
-        return items as DocumentHierarchyInfo[]
-    }
-
-    async getDocumentHierarchyInfoListByID (id: string): Promise<DocumentHierarchyInfo | undefined> {
-        const tableName = env.isProduction ? 'production' : 'development'
-        const conditionString = 'id = :id'
-        const args = {
-            ':id': id
-        }
-        const items = await this._selectItemsByKey(`molink-document-hierarchy-info-${tableName}-table`, conditionString, args)
-        if (!items) {
-            return undefined
-        }
-        return items[0] as DocumentHierarchyInfo
-    }
-
-    async getDocumentChildrenOpen (documentId: string, viewerId: number): Promise<DocumentChildrenOpen | undefined> {
-        const tableName = `molink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
-        const conditionString = 'documentId = :documentId AND viewerId = :viewerId'
-        const args = {
-            ':documentId': documentId,
-            ':viewerId': viewerId
-        }
-        const items = await this._selectItemsByKey(tableName, conditionString, args)
-        if (!items) {
-            return undefined
-        }
-        return items[0] as DocumentChildrenOpen
-    }
-
     async getDocumentChildrenOpenListByUserIdAndViewerId (userId: number, viewerId: number): Promise<DocumentChildrenOpen[]> {
         const tableName = `molink-document-children-open-${env.isProduction ? 'production' : 'development'}-table`
-        const conditionString = 'userId = :userId AND viewerId = :viewerId'
+        const conditionString = 'itemKey = :itemKey'
         const args = {
-            ':userId': userId,
-            ':viewerId': viewerId
+            ':itemKey': `${userId}-${viewerId}`
         }
         const items = await this._selectItemsByKey(tableName, conditionString, args)
         return items as DocumentChildrenOpen[]
