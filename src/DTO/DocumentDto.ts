@@ -16,39 +16,3 @@ export class GetDocumentViewInfoResponseDTO {
         this.authority = authority
     }
 }
-
-export class DocumentHierarchyDTO {
-    id: string
-    title: string
-    icon: string
-    order: number
-    parentId: string | null
-    isChildrenOpen: boolean
-
-    constructor (id: string, title: string, icon: string, order: number, parentId: string | null, isChildrenOpen: boolean) {
-        this.id = id
-        this.title = title
-        this.icon = icon
-        this.order = order
-        this.parentId = parentId
-        this.isChildrenOpen = isChildrenOpen
-    }
-}
-
-export class DocumentGeneralHierarchyInfo {
-    id: string
-    title: string
-    icon: string
-    userId: number
-    visiblity: DocumentVisibility
-    location: number[]
-
-    constructor (id: string, title: string, icon: string, userId: number, visiblity: DocumentVisibility, location: number[]) {
-        this.id = id
-        this.title = title
-        this.icon = icon
-        this.userId = userId
-        this.visiblity = visiblity
-        this.location = location
-    }
-}

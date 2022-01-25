@@ -1,9 +1,10 @@
-import { JsonController, Get, CurrentUser, Param, Authorized } from 'routing-controllers'
+import { JsonController, Get, CurrentUser, Param } from 'routing-controllers'
 import User from '../Domains/User'
-import { makeEmptyResponseMessage, makeResponseMessage } from '../DTO/Common'
+import { makeEmptyResponseMessage, makeResponseMessage } from '@newturn-develop/types-molink'
 import { DocumentHierarchyInfoNotMatching, DocumentNotExist, HierarchyUserNotExists, UnauthorizedForDocument } from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
 import DocumentService from '../Services/DocumentService'
+import HierarchyService from '../Services/HierarchyService'
 
 @JsonController('')
 export class MainController {
@@ -27,49 +28,15 @@ export class MainController {
     }
 
     @Get('/hierarchy/:nickname')
-    async getDocumentHierarchyByNickname (@CurrentUser() user: User, @Param('nickname') nickname: string) {
+    async getHierarchyByNickname (@CurrentUser() user: User, @Param('nickname') nickname: string) {
         try {
-            const data = await DocumentService.getHierarchy(user, nickname)
+            const data = await HierarchyService.getHierarchy(user, nickname)
             return makeResponseMessage(200, data)
         } catch (err) {
             if (err instanceof HierarchyUserNotExists) {
                 throw new CustomHttpError(404, 1, '유저가 존재하지 않습니다.')
             } else if (err instanceof DocumentHierarchyInfoNotMatching) {
                 throw new CustomHttpError(400, 1, '예상치 못한 에러가 발생했습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/hierarchy/children-open-map/:nickname')
-    async getDocumentHierarchyChildrenOpenMap (@CurrentUser() viewer: User, @Param('nickname') nickname: string) {
-        try {
-            const data = await DocumentService.getDocumentHierarchyChildrenOpenMap(viewer, nickname)
-            return makeResponseMessage(200, data)
-        } catch (err) {
-            if (err instanceof HierarchyUserNotExists) {
-                throw new CustomHttpError(404, 1, '유저가 존재하지 않습니다.')
-            } else if (err instanceof DocumentHierarchyInfoNotMatching) {
-                throw new CustomHttpError(400, 1, '예상치 못한 에러가 발생했습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/hierarchy/documents/:id')
-    async getDocumentHierarchyByID (@CurrentUser() user: User, @Param('id') nickname: string) {
-        try {
-            const arr = await DocumentService.getHierarchy(user, nickname)
-            return makeResponseMessage(200, arr)
-        } catch (err) {
-            if (err instanceof HierarchyUserNotExists) {
-                throw new CustomHttpError(404, 1, '유저가 존재하지 않습니다.')
-            } else if (err instanceof DocumentHierarchyInfoNotMatching) {
-                throw new CustomHttpError(400, 1, '예상치 못한 에러가 발생했습니다.')
-            } else if (err instanceof UnauthorizedForDocument) {
-                throw new CustomHttpError(403, 1, '문서에 대한 권한이 없습니다.')
             } else {
                 throw err
             }

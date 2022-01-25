@@ -1,5 +1,5 @@
 import { HttpError } from 'routing-controllers'
-import { ResponseMessage } from '../DTO/Common'
+import { ResponseMessage } from '@newturn-develop/types-molink'
 
 export class CustomHttpError extends HttpError {
     constructor (httpStatus: number, private detailStatus: number, private msg: string) {

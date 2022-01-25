@@ -1,7 +1,6 @@
-import OpenSearch from '../utils/openSearch'
+import { OpenSearch, BaseRepo } from '@newturn-develop/molink-utils'
 
 import Document from '../Domains/Document'
-import BaseRepo from './BaseRepo'
 import env from '../env'
 import DocumentChildrenOpen from '../Domains/DocumentChildrenOpen'
 

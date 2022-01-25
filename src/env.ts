@@ -31,13 +31,9 @@ const env = {
         token: process.env.SLACK_BOT_TOKEN!
     },
     redis: {
-        live: {
-            host: process.env.LIVE_REDIS_HOST!,
-            port: Number(process.env.LIVE_REDIS_PORT) || 6379
-        },
-        hierarchyChildrenOpen: {
-            host: process.env.HIERARCHY_CHILDREN_OPEN_REDIS_HOST!,
-            port: Number(process.env.HIERARCHY_CHILDREN_OPEN_REDIS_PORT) || 6379
+        hierarchy: {
+            host: process.env.HIERARCHY_REDIS_HOST!,
+            port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379
         },
         host: process.env.REDIS_HOST!,
         port: Number(process.env.REDIS_PORT) || 6379

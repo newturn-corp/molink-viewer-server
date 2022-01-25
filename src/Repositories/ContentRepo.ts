@@ -1,4 +1,4 @@
-import OpenSearch from '../utils/openSearch'
+import { OpenSearch } from '@newturn-develop/molink-utils'
 
 class ContentRepo {
     async getContentByDocumentId (documentId: string) {

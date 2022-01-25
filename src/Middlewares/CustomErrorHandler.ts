@@ -1,11 +1,11 @@
 import { ValidationError } from 'class-validator'
 import express from 'express'
 import { ExpressErrorMiddlewareInterface, HttpError, Middleware, UnauthorizedError } from 'routing-controllers'
-import { ResponseMessage } from '../DTO/Common'
+import { ResponseMessage } from '@newturn-develop/types-molink'
 import env from '../env'
 import { CustomErrorWithSlackNotification } from '../Errors/Common'
 import { CustomHttpError } from '../Errors/HttpError'
-import Slack from '../utils/Slack'
+import { Slack } from '@newturn-develop/molink-utils'
 
 /**
  * Express middleware to catch all errors throwed in controlers.

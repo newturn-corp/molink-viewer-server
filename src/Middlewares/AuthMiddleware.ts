@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Action, UnauthorizedError } from 'routing-controllers'
 import env from '../env'
-import { JWTUser } from '../Types/JWTUser'
+import { JWTUser } from '@newturn-develop/types-molink'
 import UserRepo from '../Repositories/UserRepo'
 export class AuthMiddleware {
     static async authorization (action: Action) {
