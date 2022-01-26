@@ -91,10 +91,14 @@ class HierarchyService {
             return cache
         }
 
-        const hierarchyChildrenOpen = (await HierarchyRepo.getHierarchyChildrenOpen(hierarchyKey) as any) || Automerge.from<HierarchyChildrenOpenInfoInterface>({
-            map: {},
-            lastUsedAt: new Date()
-        })
+        let hierarchyChildrenOpen = await HierarchyRepo.getHierarchyChildrenOpen(hierarchyKey) as any
+        if (!hierarchyChildrenOpen) {
+            hierarchyChildrenOpen = Automerge.from<HierarchyChildrenOpenInfoInterface>({
+                map: {},
+                lastUsedAt: new Date()
+            })
+            await HierarchyRepo.saveHierarchyChildrenOpen(hierarchyKey, hierarchyChildrenOpen)
+        }
         await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, getHierarchyChildrenOpenCacheKey(user.id, viewer.id), hierarchyChildrenOpen)
         return hierarchyChildrenOpen
     }
