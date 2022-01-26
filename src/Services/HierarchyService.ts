@@ -132,7 +132,7 @@ class HierarchyService {
         }
 
         const rawHierarchy = await this._getRawHierarchy(user)
-        const hierarchy = viewer.id === user.id ? rawHierarchy : await this._filterHierarchy(rawHierarchy, user, viewer)
+        const hierarchy = viewer && viewer.id === user.id ? rawHierarchy : await this._filterHierarchy(rawHierarchy, user, viewer)
         const hierarchyChildrenOpen = await this._getRawHierarchyChildrenOpenMap(user, viewer)
         return new GetHierarcyResponseDTO(convertAutomergeDocumentForRestAPI(hierarchy), convertAutomergeDocumentForRestAPI(hierarchyChildrenOpen))
     }
