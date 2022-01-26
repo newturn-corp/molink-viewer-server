@@ -23,6 +23,7 @@ import {
 } from '@newturn-develop/molink-utils'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
 import { convertAutomergeDocumentForRestAPI } from '@newturn-develop/molink-automerge-wrapper'
+import { getHierarchyCacheKey, getHierarchyChildrenOpenCacheKey } from '@newturn-develop/molink-constants'
 
 class HierarchyService {
     checkUserViewable (user: User, documentUserId: number, visibility: DocumentVisibility, isFollower: boolean) {
@@ -64,7 +65,7 @@ class HierarchyService {
 
     private async _getRawHierarchy (user: User) {
         // 캐싱되어있으면 Return
-        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyRedis, `hierarchy-${user.id}`)
+        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyRedis, getHierarchyCacheKey(user.id))
         if (cache) {
             return cache
         }
@@ -73,7 +74,7 @@ class HierarchyService {
         if (!hierarchy) {
             throw new HierarchyNotExists()
         }
-        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, `hierarchy-${user.id}`, hierarchy)
+        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, getHierarchyCacheKey(user.id), hierarchy)
         return hierarchy
     }
 
@@ -85,7 +86,7 @@ class HierarchyService {
             })
         }
         const hierarchyKey = `${user.id}-${viewer.id}`
-        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyRedis, `hierarchy-children-open-${hierarchyKey}`)
+        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyRedis, getHierarchyChildrenOpenCacheKey(user.id, viewer.id))
         if (cache) {
             return cache
         }
@@ -94,7 +95,7 @@ class HierarchyService {
             map: {},
             lastUsedAt: new Date()
         })
-        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, `hierarchy-children-open-${hierarchyKey}`, hierarchyChildrenOpen)
+        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, getHierarchyChildrenOpenCacheKey(user.id, viewer.id), hierarchyChildrenOpen)
         return hierarchyChildrenOpen
     }
 

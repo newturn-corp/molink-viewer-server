@@ -17,7 +17,7 @@
     "@aws-sdk/protocol-http": "^3.46.0",
     "@aws-sdk/signature-v4": "^3.46.0",
     "@newturn-develop/molink-automerge-wrapper": "^0.0.1",
-    "@newturn-develop/molink-constants": "^0.0.1",
+    "@newturn-develop/molink-constants": "^0.0.2",
     "@newturn-develop/molink-utils": "^0.0.21",
     "@newturn-develop/types-molink": "^0.0.25",
     "@slack/web-api": "^6.5.1",
