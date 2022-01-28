@@ -17,12 +17,13 @@ import {
     HierarchyInfoInterface
 } from '@newturn-develop/types-molink'
 import {
-    convertDBStringToAutomergeDocument,
     getAutomergeDocumentFromRedis,
     setAutomergeDocumentAtRedis
 } from '@newturn-develop/molink-utils'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
-import { convertAutomergeDocumentForRestAPI } from '@newturn-develop/molink-automerge-wrapper'
+import {
+    convertAutomergeDocumentForNetwork
+} from '@newturn-develop/molink-automerge-wrapper'
 import { getHierarchyCacheKey, getHierarchyChildrenOpenCacheKey } from '@newturn-develop/molink-constants'
 
 class HierarchyService {
@@ -139,7 +140,7 @@ class HierarchyService {
         const rawHierarchy = await this._getRawHierarchy(user)
         const hierarchy = viewer && viewer.id === user.id ? rawHierarchy : await this._filterHierarchy(rawHierarchy, user, viewer)
         const hierarchyChildrenOpen = await this._getRawHierarchyChildrenOpenMap(user, viewer)
-        return new GetHierarcyResponseDTO(convertAutomergeDocumentForRestAPI(hierarchy), convertAutomergeDocumentForRestAPI(hierarchyChildrenOpen))
+        return new GetHierarcyResponseDTO(convertAutomergeDocumentForNetwork(hierarchy), convertAutomergeDocumentForNetwork(hierarchyChildrenOpen))
     }
 }
 export default new HierarchyService()

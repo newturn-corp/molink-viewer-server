@@ -1,11 +1,12 @@
 import {
-    BaseRepo,
-    convertAutomergeDocumentToDBString,
-    convertDBStringToAutomergeDocument,
-    Dynamo
+    BaseRepo
 } from '@newturn-develop/molink-utils'
 import { HierarchyChildrenOpenRepoName, HierarchyRepoName } from '@newturn-develop/molink-constants'
 import Automerge from 'automerge'
+import {
+    convertAutomergeDocumentToDBArray,
+    convertDBArrayToAutomergeDocument
+} from '@newturn-develop/molink-automerge-wrapper'
 
 class HierarchyRepo extends BaseRepo {
     async getHierarchy (userId: number) {
@@ -18,7 +19,7 @@ class HierarchyRepo extends BaseRepo {
         if (!item) {
             return item
         }
-        return convertDBStringToAutomergeDocument(item.automergeValue)
+        return convertDBArrayToAutomergeDocument(item.automergeValue)
     }
 
     async getHierarchyChildrenOpen (hierarchyKey: string) {
@@ -31,13 +32,13 @@ class HierarchyRepo extends BaseRepo {
         if (!item) {
             return item
         }
-        return convertDBStringToAutomergeDocument(item.automergeValue)
+        return convertDBArrayToAutomergeDocument(item.automergeValue)
     }
 
     saveHierarchyChildrenOpen (hierarchyKey: string, automergeValue: Automerge.FreezeObject<any>) {
         return this._insertToDynamo(HierarchyChildrenOpenRepoName, {
             hierarchyKey,
-            automergeValue: convertAutomergeDocumentToDBString(automergeValue)
+            automergeValue: convertAutomergeDocumentToDBArray(automergeValue)
         })
     }
 }
