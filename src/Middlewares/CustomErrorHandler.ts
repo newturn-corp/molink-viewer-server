@@ -82,9 +82,9 @@ export class CustomErrorHandler implements ExpressErrorMiddlewareInterface {
                     msg: '알 수 없는 오류가 발생했습니다'
                 }
                 if (env.isProduction) {
-                    Slack.sendTextMessage(JSON.stringify(error), 'C02SE9VA8TC')
+                    Slack.sendTextMessage(JSON.stringify(errorObject), 'C02SE9VA8TC')
                 } else {
-                    Slack.sendTextMessage(JSON.stringify(error), 'C02TWKQHJ64')
+                    Slack.sendTextMessage(JSON.stringify(errorObject), 'C02TWKQHJ64')
                 }
             }
             return res.json(errorObject)
@@ -106,9 +106,9 @@ export class CustomErrorHandler implements ExpressErrorMiddlewareInterface {
         }
         console.error(errorObject)
         if (env.isProduction) {
-            Slack.sendTextMessage(JSON.stringify(error), 'C02SE9VA8TC')
+            Slack.sendTextMessage(JSON.stringify(errorObject), 'C02SE9VA8TC')
         } else {
-            Slack.sendTextMessage(JSON.stringify(error), 'C02TWKQHJ64')
+            Slack.sendTextMessage(JSON.stringify(errorObject), 'C02TWKQHJ64')
         }
 
         res.status(500)
