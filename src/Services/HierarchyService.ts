@@ -1,5 +1,4 @@
 import Automerge from 'automerge'
-import { DocumentVisibility } from '../Domains/Document'
 import User from '../Domains/User'
 import {
     HierarchyNotExists,
@@ -9,6 +8,7 @@ import FollowerRepo from '../Repositories/FollowRepo'
 import UserRepo from '../Repositories/UserRepo'
 import CacheService from './CacheService'
 import {
+    DocumentVisibility,
     GetHierarcyResponseDTO,
     HierarchyChildrenOpenInfoInterface,
     HierarchyDocumentInfoInterface,
@@ -22,7 +22,7 @@ import HierarchyRepo from '../Repositories/HierarchyRepo'
 import {
     convertAutomergeDocumentForNetwork
 } from '@newturn-develop/molink-automerge-wrapper'
-import { getHierarchyCacheKey, getHierarchyChildrenOpenCacheKey } from '@newturn-develop/molink-constants'
+import { getHierarchyChildrenOpenCacheKey } from '@newturn-develop/molink-constants'
 
 class HierarchyService {
     checkUserViewable (user: User, documentUserId: number, visibility: DocumentVisibility, isFollower: boolean) {

@@ -5,5 +5,3 @@ export class CustomError extends Error {
 }
 
 export class CustomErrorWithSlackNotification extends CustomError {}
-
-export class InvalidParam extends CustomError {}

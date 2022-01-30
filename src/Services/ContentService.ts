@@ -1,4 +1,3 @@
-import Document, { DocumentVisibility } from '../Domains/Document'
 import User from '../Domains/User'
 import {
     DocumentNotExist
@@ -6,7 +5,7 @@ import {
 import ContentRepo from '../Repositories/ContentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
-import { DocumentContentInterface, GetContentResponseDTO } from '@newturn-develop/types-molink'
+import { DocumentContentInterface, DocumentVisibility, GetContentResponseDTO } from '@newturn-develop/types-molink'
 import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
 import UserRepo from '../Repositories/UserRepo'
 import { convertAutomergeDocumentForNetwork } from '@newturn-develop/molink-automerge-wrapper'
@@ -43,11 +42,6 @@ class ContentService {
     async checkIsFollower (targetId: number, viewerId: number) {
         const followers = await FollowerRepo.getUserFollowers(targetId)
         return followers.map(follower => follower.id).includes(viewerId)
-    }
-
-    checkDocumentEditable (user: User, document: Document) {
-        // 3. 주인인 경우 무조건 성공
-        return document.userId === user.id
     }
 
     async getContent (viewer: User, documentId: string) {
