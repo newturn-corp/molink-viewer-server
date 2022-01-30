@@ -5,6 +5,7 @@ import { DocumentHierarchyInfoNotMatching, DocumentNotExist, HierarchyUserNotExi
 import { CustomHttpError } from '../Errors/HttpError'
 import HierarchyService from '../Services/HierarchyService'
 import ContentService from '../Services/ContentService'
+import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
 
 @JsonController('')
 export class MainController {
@@ -19,8 +20,12 @@ export class MainController {
             const dto = await ContentService.getContent(user, id)
             return makeResponseMessage(200, dto)
         } catch (err) {
-            if (err instanceof DocumentNotExist) {
+            if (err instanceof ContentNotExists) {
                 throw new CustomHttpError(404, 1, '문서가 존재하지 않습니다.')
+            } else if (err instanceof ContentUserNotExists) {
+                throw new CustomHttpError(404, 2, '사용자가 존재하지 않습니다.')
+            } else if (err instanceof UnauthorizedForContent) {
+                throw new CustomHttpError(409, 1, '권한이 없습니다.')
             } else {
                 throw err
             }
