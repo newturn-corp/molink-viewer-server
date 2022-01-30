@@ -1,10 +1,10 @@
 import { JsonController, Get, CurrentUser, Param } from 'routing-controllers'
 import User from '../Domains/User'
 import { makeEmptyResponseMessage, makeResponseMessage } from '@newturn-develop/types-molink'
-import { DocumentHierarchyInfoNotMatching, DocumentNotExist, HierarchyUserNotExists, UnauthorizedForDocument } from '../Errors/DocumentError'
+import { DocumentHierarchyInfoNotMatching, DocumentNotExist, HierarchyUserNotExists } from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
-import DocumentService from '../Services/DocumentService'
 import HierarchyService from '../Services/HierarchyService'
+import ContentService from '../Services/ContentService'
 
 @JsonController('')
 export class MainController {
@@ -13,10 +13,10 @@ export class MainController {
         return makeEmptyResponseMessage(200)
     }
 
-    @Get('/documents/:id')
-    async getDocument (@CurrentUser() user: User, @Param('id') id: string) {
+    @Get('/contents/:id')
+    async getContent (@CurrentUser() user: User, @Param('id') id: string) {
         try {
-            const dto = await DocumentService.getDocument(user, id)
+            const dto = await ContentService.getContent(user, id)
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof DocumentNotExist) {

@@ -9,10 +9,8 @@ import FollowerRepo from '../Repositories/FollowRepo'
 import UserRepo from '../Repositories/UserRepo'
 import CacheService from './CacheService'
 import {
-    GetHierarchyChildrenOpenDTO,
     GetHierarcyResponseDTO,
     HierarchyChildrenOpenInfoInterface,
-    HierarchyComponentBlockInterface,
     HierarchyDocumentInfoInterface,
     HierarchyInfoInterface
 } from '@newturn-develop/types-molink'
@@ -64,21 +62,6 @@ class HierarchyService {
         }
     }
 
-    private async _getRawHierarchy (user: User) {
-        // 캐싱되어있으면 Return
-        const cache = await getAutomergeDocumentFromRedis(CacheService.hierarchyRedis, getHierarchyCacheKey(user.id))
-        if (cache) {
-            return cache
-        }
-
-        const hierarchy = await HierarchyRepo.getHierarchy(user.id) as any
-        if (!hierarchy) {
-            throw new HierarchyNotExists()
-        }
-        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, getHierarchyCacheKey(user.id), hierarchy)
-        return hierarchy
-    }
-
     private async _getRawHierarchyChildrenOpenMap (user: User, viewer: User | null) {
         if (!viewer) {
             return Automerge.from<HierarchyChildrenOpenInfoInterface>({
@@ -105,28 +88,25 @@ class HierarchyService {
     }
 
     private async _filterHierarchy (hierarchy: Automerge.FreezeObject<HierarchyInfoInterface>, user: User, viewer: User): Promise<Automerge.FreezeObject<HierarchyInfoInterface>> {
-        const isFollower = await this.checkIsFollower(user.id, viewer.id)
-        const documents = Object.values(hierarchy.map).filter(document => this.checkUserViewable(viewer, document.userId, document.visibility, isFollower))
-
-        const tempMap = new Map<string, HierarchyComponentBlockInterface>()
-        const documentMap: Map<string, HierarchyDocumentInfoInterface> = new Map<string, HierarchyDocumentInfoInterface>()
-        documents.forEach(document => {
-            documentMap.set(document.id, document)
-            tempMap.set(document.id, { id: document.id, children: [] })
-        })
-        documents.filter(document => document.parentId).forEach(document => {
-            const parent = tempMap.get(document.parentId || '')
-            if (parent) {
-                parent.children.push({ id: document.id, children: [] })
+        const isFollower = viewer && await this.checkIsFollower(user.id, viewer.id)
+        const map: {
+            [index: string]: HierarchyDocumentInfoInterface
+        } = {}
+        const topLevelDocumentIdList: string[] = []
+        Object.values(hierarchy.map).forEach(document => {
+            if (this.checkUserViewable(viewer, document.userId, document.visibility, isFollower)) {
+                return
+            }
+            map[document.id] = document
+            if (!document.parentId) {
+                topLevelDocumentIdList.push(document.id)
             }
         })
-        documents.filter(document => document.parentId).forEach(document => {
-            tempMap.delete(document.id)
-        })
+        topLevelDocumentIdList.sort((a, b) => map[a].order - map[b].order)
 
         return Automerge.from<HierarchyInfoInterface>({
-            map: Object.fromEntries(documentMap),
-            list: Array.from(tempMap.values()),
+            map,
+            topLevelDocumentIdList,
             lastUsedAt: new Date()
         })
     }
@@ -137,10 +117,13 @@ class HierarchyService {
             throw new HierarchyUserNotExists()
         }
 
-        const rawHierarchy = await this._getRawHierarchy(user)
-        const hierarchy = viewer && viewer.id === user.id ? rawHierarchy : await this._filterHierarchy(rawHierarchy, user, viewer)
+        const hierarchy = await HierarchyRepo.getHierarchy(user.id)
+        if (!hierarchy) {
+            throw new HierarchyNotExists()
+        }
+        const filteredHierarchy = viewer && viewer.id === user.id ? hierarchy : await this._filterHierarchy(hierarchy, user, viewer)
         const hierarchyChildrenOpen = await this._getRawHierarchyChildrenOpenMap(user, viewer)
-        return new GetHierarcyResponseDTO(convertAutomergeDocumentForNetwork(hierarchy), convertAutomergeDocumentForNetwork(hierarchyChildrenOpen))
+        return new GetHierarcyResponseDTO(convertAutomergeDocumentForNetwork(filteredHierarchy), convertAutomergeDocumentForNetwork(hierarchyChildrenOpen))
     }
 }
 export default new HierarchyService()

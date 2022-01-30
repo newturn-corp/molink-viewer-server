@@ -35,6 +35,10 @@ const env = {
             host: process.env.HIERARCHY_REDIS_HOST!,
             port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379
         },
+        content: {
+            host: process.env.CONTENT_REDIS_HOST!,
+            port: Number(process.env.CONTENT_REDIS_PORT) || 6379
+        },
         host: process.env.REDIS_HOST!,
         port: Number(process.env.REDIS_PORT) || 6379
     },

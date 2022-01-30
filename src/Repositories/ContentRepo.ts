@@ -1,37 +1,27 @@
-import { OpenSearch } from '@newturn-develop/molink-utils'
+import { BaseRepo, getAutomergeDocumentFromRedis, setAutomergeDocumentAtRedis } from '@newturn-develop/molink-utils'
+import { ContentRepoName } from '@newturn-develop/molink-constants'
+import { convertDBArrayToAutomergeDocument } from '@newturn-develop/molink-automerge-wrapper'
+import CacheService from '../Services/CacheService'
 
-class ContentRepo {
-    async getContentByDocumentId (documentId: string) {
-        const rawDocuments = await OpenSearch.select('knowlink-content', {
-            query: {
-                match: {
-                    documentId
-                }
-            },
-            size: 1
-        }) as any
-        if (rawDocuments.length === 0) {
+class ContentRepo extends BaseRepo {
+    async getContent (documentId: string) {
+        const cache = await getAutomergeDocumentFromRedis(CacheService.contentRedis, documentId)
+        if (cache) {
+            return cache
+        }
+
+        const rawContent = await this._selectSingularDynamoByKey(
+            ContentRepoName,
+            'documentId = :documentId',
+            {
+                ':documentId': documentId
+            })
+        if (!rawContent) {
             return undefined
         }
-        return rawDocuments[0]._source.content
-    }
-
-    async getContent (id: string) {
-        const rawContent = await OpenSearch.get('knowlink-content', id) as any
-        return rawContent.content
-    }
-
-    async saveContent (content: any) {
-        const id = await OpenSearch.insert('knowlink-content', 'content', { content, createdAt: new Date(), updatedAt: new Date() }) as string
-        return id
-    }
-
-    async updateContent (id: string, content: any) {
-        await OpenSearch.update('knowlink-content', id, { content, updatedAt: new Date() })
-    }
-
-    async deleteContent (id: string) {
-        await OpenSearch.delete('knowlink-content', id, 'content')
+        const content = convertDBArrayToAutomergeDocument(rawContent.automergeValue)
+        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, documentId, content)
+        return content
     }
 }
 export default new ContentRepo()
