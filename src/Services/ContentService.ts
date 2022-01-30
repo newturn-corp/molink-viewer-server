@@ -63,7 +63,7 @@ class ContentService {
         }
         const isFollower = viewer && await this.checkIsFollower(contentUser.id, viewer.id)
         const isViewable = this.checkUserViewable(viewer, contentUser.id, document.visibility, isFollower)
-        if (isViewable) {
+        if (!isViewable) {
             throw new UnauthorizedForContent()
         }
         return new GetContentResponseDTO(convertAutomergeDocumentForNetwork(content))
