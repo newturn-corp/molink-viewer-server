@@ -5,7 +5,12 @@ import {
 import ContentRepo from '../Repositories/ContentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
-import { DocumentContentInterface, DocumentVisibility, GetContentResponseDTO } from '@newturn-develop/types-molink'
+import {
+    DocumentContentInterface,
+    DocumentVisibility,
+    GetContentResponseDTO,
+    HierarchyDocumentInfoInterface
+} from '@newturn-develop/types-molink'
 import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
 import UserRepo from '../Repositories/UserRepo'
 import { convertAutomergeDocumentForNetwork } from '@newturn-develop/molink-automerge-wrapper'
@@ -57,7 +62,7 @@ class ContentService {
         if (!hierarchy) {
             throw new ContentUserNotExists()
         }
-        const document = hierarchy.map[documentId]
+        const document = hierarchy.getMap('map').get(documentId) as HierarchyDocumentInfoInterface
         if (!document) {
             throw new DocumentNotExist()
         }

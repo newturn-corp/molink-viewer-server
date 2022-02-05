@@ -16,7 +16,7 @@ class HierarchyRepo {
         this.client = getKnexClient('pg', env.postgre.host, env.postgre.user, env.postgre.password, env.postgre.name)
     }
 
-    async getUpdates (userId: number) {
+    async getHierarchy (userId: number) {
         const updates = await this.client.transaction(async (transaction) => {
             const updates = await this.client<HierarchyUpdate>('items').transacting(transaction).where('userId', userId).forUpdate().orderBy('id')
 

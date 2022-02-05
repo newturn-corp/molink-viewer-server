@@ -83,7 +83,7 @@ class HierarchyService {
             throw new HierarchyUserNotExists()
         }
 
-        const hierarchy = await HierarchyRepo.getUpdates(user.id)
+        const hierarchy = await HierarchyRepo.getHierarchy(user.id)
         if (!hierarchy) {
             throw new HierarchyNotExists()
         }
