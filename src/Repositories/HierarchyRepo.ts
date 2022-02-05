@@ -1,60 +1,54 @@
-import {
-    BaseRepo, getAutomergeDocumentFromRedis, setAutomergeDocumentAtRedis
-} from '@newturn-develop/molink-utils'
-import {
-    getHierarchyCacheKey,
-    HierarchyChildrenOpenRepoName,
-    HierarchyRepoName
-} from '@newturn-develop/molink-constants'
-import Automerge from 'automerge'
-import {
-    convertAutomergeDocumentToDBArray,
-    convertDBArrayToAutomergeDocument
-} from '@newturn-develop/molink-automerge-wrapper'
-import CacheService from '../Services/CacheService'
-import { HierarchyNotExists } from '../Errors/DocumentError'
-import { HierarchyInfoInterface } from '@newturn-develop/types-molink'
+import { Knex } from 'knex'
+import { getKnexClient } from '@newturn-develop/molink-utils'
+import env from '../env'
+import * as Y from 'yjs'
 
-class HierarchyRepo extends BaseRepo {
-    async getHierarchy (userId: number) {
-        // 캐싱되어있으면 Return
-        const cache = await getAutomergeDocumentFromRedis<HierarchyInfoInterface>(CacheService.hierarchyRedis, getHierarchyCacheKey(userId))
-        if (cache) {
-            return cache
-        }
+interface HierarchyUpdate {
+    id: string;
+    userId: number;
+    update: Uint8Array;
+}
 
-        const rawHierarchy = await this._selectSingularDynamoByKey(
-            HierarchyRepoName,
-            'userId = :userId',
-            {
-                ':userId': userId
-            })
-        if (!rawHierarchy) {
+class HierarchyRepo {
+    client: Knex<HierarchyUpdate>
+
+    constructor () {
+        this.client = getKnexClient('pg', env.postgre.host, env.postgre.user, env.postgre.password, env.postgre.name)
+    }
+
+    async getUpdates (userId: number) {
+        const updates = await this.client.transaction(async (transaction) => {
+            const updates = await this.client<HierarchyUpdate>('items').transacting(transaction).where('userId', userId).forUpdate().orderBy('id')
+
+            if (updates.length >= 50) {
+                const dbYDoc = new Y.Doc()
+
+                dbYDoc.transact(() => {
+                    for (const { update } of updates) {
+                        Y.applyUpdate(dbYDoc, update)
+                    }
+                })
+
+                const [mergedUpdates] = await Promise.all([
+                    this.client<HierarchyUpdate>('items').transacting(transaction).insert({ userId, update: Y.encodeStateAsUpdate(dbYDoc) }).returning('*'),
+                    this.client<HierarchyUpdate>('items').transacting(transaction).where('userId', userId).whereIn('id', updates.map(({ id }) => id)).delete()
+                ])
+
+                return mergedUpdates
+            } else {
+                return updates
+            }
+        })
+        if (updates.length === 0) {
             return undefined
         }
-        const hierarchy = convertDBArrayToAutomergeDocument<HierarchyInfoInterface>(rawHierarchy.automergeValue)
-        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, getHierarchyCacheKey(userId), hierarchy)
-        return hierarchy
-    }
-
-    async getHierarchyChildrenOpen (hierarchyKey: string) {
-        const item = await this._selectSingularDynamoByKey(
-            HierarchyChildrenOpenRepoName,
-            'hierarchyKey = :hierarchyKey',
-            {
-                ':hierarchyKey': hierarchyKey
-            })
-        if (!item) {
-            return item
-        }
-        return convertDBArrayToAutomergeDocument(item.automergeValue)
-    }
-
-    saveHierarchyChildrenOpen (hierarchyKey: string, automergeValue: Automerge.FreezeObject<any>) {
-        return this._insertToDynamo(HierarchyChildrenOpenRepoName, {
-            hierarchyKey,
-            automergeValue: convertAutomergeDocumentToDBArray(automergeValue)
+        const document = new Y.Doc()
+        document.transact(() => {
+            for (const { update } of updates) {
+                Y.applyUpdate(document, update)
+            }
         })
+        return document
     }
 }
 

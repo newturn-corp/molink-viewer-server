@@ -42,6 +42,12 @@ const env = {
         host: process.env.REDIS_HOST!,
         port: Number(process.env.REDIS_PORT) || 6379
     },
+    postgre: {
+        host: process.env.POSTGRE_DB_HOST!,
+        user: process.env.POSTGRE_DB_USER!,
+        password: process.env.POSTGRE_DB_PASSWORD!,
+        name: process.env.POSTGRE_DB_NAME!
+    },
     allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
 }
 

@@ -18,8 +18,8 @@
     "@aws-sdk/signature-v4": "^3.46.0",
     "@newturn-develop/molink-automerge-wrapper": "^0.0.6",
     "@newturn-develop/molink-constants": "^0.0.3",
-    "@newturn-develop/molink-utils": "^0.0.28",
-    "@newturn-develop/types-molink": "^0.0.36",
+    "@newturn-develop/molink-utils": "^0.0.30",
+    "@newturn-develop/types-molink": "^0.0.38",
     "@slack/web-api": "^6.5.1",
     "automerge": "^1.0.1-preview.6",
     "aws-sdk": "^2.1055.0",
@@ -33,10 +33,12 @@
     "ioredis": "^4.28.3",
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
+    "knex": "^1.0.2",
     "moment-timezone": "^0.5.34",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
-    "routing-controllers": "^0.9.0"
+    "routing-controllers": "^0.9.0",
+    "yjs": "^13.5.27"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",
