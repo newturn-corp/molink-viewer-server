@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/ubuntu/knowlink-viewer
+cd /home/ubuntu/viewer
 node infra/scripts/loadParametersFromAWSSSM.js

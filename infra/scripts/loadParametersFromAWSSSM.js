@@ -1,13 +1,13 @@
 #!/usr/bin/node
 const fs = require('fs')
 // eslint-disable-next-line import/no-absolute-path
-const AWS = require('/home/ubuntu/knowlink-viewer/node_modules/aws-sdk')
+const AWS = require('/home/ubuntu/viewer/node_modules/aws-sdk')
 AWS.config.update({ region: 'ap-northeast-2' })
 const ssm = new AWS.SSM()
 
 async function loadEnvParameters (envParams, token) {
     const params = {
-        Path: `/knowlink-viewer/${process.env.DEPLOYMENT_GROUP_NAME}/`,
+        Path: `/viewer/${process.env.DEPLOYMENT_GROUP_NAME}/`,
         Recursive: true,
         WithDecryption: true,
         NextToken: token
@@ -28,7 +28,7 @@ async function loadEnvParameters (envParams, token) {
 async function createDotEnv () {
     const envParams = await loadEnvParameters([], null)
     const envString = envParams.sort().join('\n')
-    fs.writeFileSync('/home/ubuntu/knowlink-viewer/.env', envString)
+    fs.writeFileSync('/home/ubuntu/viewer/.env', envString)
 }
 
 createDotEnv()

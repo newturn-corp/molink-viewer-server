@@ -14,7 +14,7 @@ const s3 = new aws.S3()
 
 const body = fs.createReadStream('/home/ubuntu/log.zip')
 const param = {
-    Bucket: 'knowlink-viewer-instance-log',
+    Bucket: 'viewer-instance-log',
     Body: body,
     Key: `log__${moment().format('YYYY-MM-DD_HH:mm:ss')}_${ip.address()}.zip`
 }

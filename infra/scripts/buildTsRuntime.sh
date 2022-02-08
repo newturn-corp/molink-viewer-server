@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Build Ts Package"
-cd /home/ubuntu/knowlink-viewer
+cd /home/ubuntu/viewer
 # production packages
 rm -r build
 
