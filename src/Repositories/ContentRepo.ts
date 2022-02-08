@@ -1,27 +1,55 @@
-import { BaseRepo, getAutomergeDocumentFromRedis, setAutomergeDocumentAtRedis } from '@newturn-develop/molink-utils'
-import { ContentRepoName } from '@newturn-develop/molink-constants'
-import { convertDBArrayToAutomergeDocument } from '@newturn-develop/molink-automerge-wrapper'
-import CacheService from '../Services/CacheService'
+import { Knex } from 'knex'
+import { getKnexClient } from '@newturn-develop/molink-utils'
+import env from '../env'
+import * as Y from 'yjs'
 
-class ContentRepo extends BaseRepo {
+interface ContentUpdate {
+    id: string;
+    documentId: string;
+    update: Uint8Array;
+}
+
+class ContentRepo {
+    client: Knex<ContentUpdate>
+
+    constructor () {
+        this.client = getKnexClient('pg', env.postgre.hierarchy.host, env.postgre.hierarchy.user, env.postgre.hierarchy.password, env.postgre.hierarchy.name)
+    }
+
     async getContent (documentId: string) {
-        const cache = await getAutomergeDocumentFromRedis(CacheService.contentRedis, documentId)
-        if (cache) {
-            return cache
-        }
+        const updates = await this.client.transaction(async (transaction) => {
+            const updates = await this.client<ContentUpdate>('items').transacting(transaction).where('documentId', documentId).forUpdate().orderBy('id')
 
-        const rawContent = await this._selectSingularDynamoByKey(
-            ContentRepoName,
-            'documentId = :documentId',
-            {
-                ':documentId': documentId
-            })
-        if (!rawContent) {
+            if (updates.length >= 50) {
+                const dbYDoc = new Y.Doc()
+
+                dbYDoc.transact(() => {
+                    for (const { update } of updates) {
+                        Y.applyUpdate(dbYDoc, update)
+                    }
+                })
+
+                const [mergedUpdates] = await Promise.all([
+                    this.client<ContentUpdate>('items').transacting(transaction).insert({ documentId, update: Y.encodeStateAsUpdate(dbYDoc) }).returning('*'),
+                    this.client<ContentUpdate>('items').transacting(transaction).where('documentId', documentId).whereIn('id', updates.map(({ id }) => id)).delete()
+                ])
+
+                return mergedUpdates
+            } else {
+                return updates
+            }
+        })
+        if (updates.length === 0) {
             return undefined
         }
-        const content = convertDBArrayToAutomergeDocument(rawContent.automergeValue)
-        await setAutomergeDocumentAtRedis(CacheService.hierarchyRedis, documentId, content)
-        return content
+        const document = new Y.Doc()
+        document.transact(() => {
+            for (const { update } of updates) {
+                Y.applyUpdate(document, update)
+            }
+        })
+        return document
     }
 }
+
 export default new ContentRepo()

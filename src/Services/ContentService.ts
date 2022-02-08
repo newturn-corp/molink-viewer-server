@@ -1,19 +1,12 @@
 import User from '../Domains/User'
-import {
-    DocumentNotExist
-} from '../Errors/DocumentError'
 import ContentRepo from '../Repositories/ContentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
-import HierarchyRepo from '../Repositories/HierarchyRepo'
 import {
-    DocumentContentInterface,
     DocumentVisibility,
-    GetContentResponseDTO,
-    HierarchyDocumentInfoInterface
+    GetContentResponseDTO
 } from '@newturn-develop/types-molink'
-import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
-import UserRepo from '../Repositories/UserRepo'
-import { convertAutomergeDocumentForNetwork } from '@newturn-develop/molink-automerge-wrapper'
+import { ContentNotExists, UnauthorizedForContent } from '../Errors/ContentError'
+import * as Y from 'yjs'
 
 class ContentService {
     checkUserViewable (user: User, documentUserId: number, visibility: DocumentVisibility, isFollower: boolean) {
@@ -49,29 +42,20 @@ class ContentService {
         return followers.map(follower => follower.id).includes(viewerId)
     }
 
-    async getContent (viewer: User, documentId: string) {
-        const content = await ContentRepo.getContent(documentId) as DocumentContentInterface
+    public async getContent (viewer: User, documentId: string) {
+        const content = await ContentRepo.getContent(documentId)
         if (!content) {
             throw new ContentNotExists()
         }
-        const contentUser = await UserRepo.getActiveUserById(content.userId)
-        if (!contentUser) {
-            throw new ContentUserNotExists()
-        }
-        const hierarchy = await HierarchyRepo.getHierarchy(content.userId)
-        if (!hierarchy) {
-            throw new ContentUserNotExists()
-        }
-        const document = hierarchy.getMap('map').get(documentId) as HierarchyDocumentInfoInterface
-        if (!document) {
-            throw new DocumentNotExist()
-        }
-        const isFollower = viewer && await this.checkIsFollower(contentUser.id, viewer.id)
-        const isViewable = this.checkUserViewable(viewer, contentUser.id, document.visibility, isFollower)
+        const info = content.getMap('info')
+        const documentUserId = info.get('userId') as number
+        const visibility = info.get('visibility') as DocumentVisibility
+        const isFollower = await this.checkIsFollower(documentUserId, viewer.id)
+        const isViewable = this.checkUserViewable(viewer, documentUserId, visibility, isFollower)
         if (!isViewable) {
             throw new UnauthorizedForContent()
         }
-        return new GetContentResponseDTO(convertAutomergeDocumentForNetwork(content))
+        return new GetContentResponseDTO(Array.from(Y.encodeStateAsUpdate(content)))
     }
 }
 export default new ContentService()

@@ -13,7 +13,7 @@ class HierarchyRepo {
     client: Knex<HierarchyUpdate>
 
     constructor () {
-        this.client = getKnexClient('pg', env.postgre.host, env.postgre.user, env.postgre.password, env.postgre.name)
+        this.client = getKnexClient('pg', env.postgre.hierarchy.host, env.postgre.hierarchy.user, env.postgre.hierarchy.password, env.postgre.hierarchy.name)
     }
 
     async getHierarchy (userId: number) {

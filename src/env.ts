@@ -11,11 +11,6 @@ const env = {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
         region: process.env.AWS_REGION!
     },
-    opensearch: {
-        index: process.env.OPENSEARCH_INDEX!,
-        domain: process.env.OPENSEARCH_DOMAIN!,
-        region: process.env.OPENSEARCH_REGION!
-    },
     mysql: {
         host: process.env.MYSQL_DB_HOST!,
         port: Number(process.env.MYSQL_DB_PORT) || 3306,
@@ -30,23 +25,19 @@ const env = {
     slack: {
         token: process.env.SLACK_BOT_TOKEN!
     },
-    redis: {
+    postgre: {
         hierarchy: {
-            host: process.env.HIERARCHY_REDIS_HOST!,
-            port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379
+            host: process.env.HIERARCHY_POSTGRE_DB_HOST!,
+            user: process.env.HIERARCHY_POSTGRE_DB_USER!,
+            password: process.env.HIERARCHY_POSTGRE_DB_PASSWORD!,
+            name: process.env.HIERARCHY_POSTGRE_DB_NAME!
         },
         content: {
-            host: process.env.CONTENT_REDIS_HOST!,
-            port: Number(process.env.CONTENT_REDIS_PORT) || 6379
-        },
-        host: process.env.REDIS_HOST!,
-        port: Number(process.env.REDIS_PORT) || 6379
-    },
-    postgre: {
-        host: process.env.POSTGRE_DB_HOST!,
-        user: process.env.POSTGRE_DB_USER!,
-        password: process.env.POSTGRE_DB_PASSWORD!,
-        name: process.env.POSTGRE_DB_NAME!
+            host: process.env.CONTENT_POSTGRE_DB_HOST!,
+            user: process.env.CONTENT_POSTGRE_DB_USER!,
+            password: process.env.CONTENT_POSTGRE_DB_PASSWORD!,
+            name: process.env.CONTENT_POSTGRE_DB_NAME!
+        }
     },
     allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
 }
