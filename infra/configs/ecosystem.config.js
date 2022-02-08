@@ -1,6 +1,6 @@
 module.exports = {
     apps: [{
-        name: 'knowlink-viewer',
+        name: 'viewer',
         script: 'build/app.js',
         exec_mode: 'cluster',
         instances: '2',

@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "run server"
-cd /home/ubuntu/knowlink-viewer
-pm2 startOrReload /home/ubuntu/knowlink-viewer/infra/configs/ecosystem.config.js
+cd /home/ubuntu/viewer
+pm2 startOrReload /home/ubuntu/viewer/infra/configs/ecosystem.config.js

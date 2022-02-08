@@ -12,7 +12,7 @@ Slack.init(env.slack.token)
 const app = express()
 useMiddleware(app)
 app.listen(env.port, () => {
-    console.log(`knowlink-viewer start at ${env.port}`)
+    console.log(`viewer server start at ${env.port}`)
 })
 
 export default app

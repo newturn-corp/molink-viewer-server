@@ -14,12 +14,12 @@ cd /home/ubuntu
 checkThenCreateDir log
 
 # clean up old source code
-if [ -d knowlink-viewer ]
+if [ -d viewer ]
 then
-    echo "clean up: knowlink-viewer"
-    rm -r knowlink-viewer
-    mkdir knowlink-viewer
+    echo "clean up: viewer"
+    rm -r viewer
+    mkdir viewer
 else
-    echo "create dir: knowlink-viewer"
-    mkdir knowlink-viewer
+    echo "create dir: viewer"
+    mkdir viewer
 fi

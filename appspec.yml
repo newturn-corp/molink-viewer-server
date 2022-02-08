@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/knowlink-viewer
+    destination: /home/ubuntu/viewer
 permissions:
-  - object: /home/ubuntu/knowlink-viewer
+  - object: /home/ubuntu/viewer
     owner: ubuntu
 hooks:
   ApplicationStop:
@@ -22,7 +22,7 @@ hooks:
     - location: infra/scripts/loadParametersFromAWSSSM.sh
       runas: ubuntu
   ApplicationStart:
-    - location: infra/scripts/runServer.sh 
+    - location: infra/scripts/runServer.sh
       runas: ubuntu
   ValidateService:
   BeforeAllowTraffic:
