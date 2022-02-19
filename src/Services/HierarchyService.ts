@@ -1,12 +1,8 @@
 import User from '../Domains/User'
 import {
-    HierarchyNotExists,
-    HierarchyUserNotExists
+    HierarchyNotExists
 } from '../Errors/DocumentError'
-import FollowerRepo from '../Repositories/FollowRepo'
-import UserRepo from '../Repositories/UserRepo'
 import {
-    DocumentVisibility,
     GetHierarcyResponseDTO,
     HierarchyDocumentInfoInterface
 } from '@newturn-develop/types-molink'
