@@ -5,3 +5,5 @@ export class CustomError extends Error {
 }
 
 export class CustomErrorWithSlackNotification extends CustomError {}
+
+export class UserNotExists extends CustomError {}
