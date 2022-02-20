@@ -11,7 +11,7 @@ import { DocumentNotExist, DocumentUserNotExists, HierarchyNotExists } from '../
 import UserRepo from '../Repositories/UserRepo'
 
 class AuthorityService {
-    checkDocumentVisible (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
+    checkDocumentViewable (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
         const {
             visibility,
             userId: documentUserId
@@ -71,7 +71,12 @@ class AuthorityService {
         const hierarchyDocumentInfo = hierarchy.getMap('documentHierarchyInfoMap').get(documentId) as HierarchyDocumentInfoInterface
 
         const isFollower = viewer && await this.checkIsFollower(documentUserId, viewer.id)
-        return new GetDocumentAuthorityDTO(documentUserId, documentUser.nickname, this.checkDocumentVisible(viewer, hierarchyDocumentInfo, isFollower), this.checkDocumentEditable(viewer, hierarchyDocumentInfo))
+        const viewable = this.checkDocumentViewable(viewer, hierarchyDocumentInfo, isFollower)
+        const editable = this.checkDocumentEditable(viewer, hierarchyDocumentInfo)
+        if (!viewable) {
+            return new GetDocumentAuthorityDTO(null, null, null, viewable, editable)
+        }
+        return new GetDocumentAuthorityDTO(documentUserId, documentUser.nickname, hierarchyDocumentInfo.title, viewable, editable)
     }
 }
 export default new AuthorityService()
