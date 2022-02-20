@@ -12,13 +12,6 @@ import userAgent from 'express-useragent'
 
 export function useMiddleware (app: express.Application) {
     app.set('port', env.port || 8000)
-    app.use(
-        cors({
-            credentials: true,
-            preflightContinue: true,
-            origin: env.allow_origin_list.split(',')
-        })
-    )
     morgan.token('date', () => {
         return moment().format('YYYY-MM-DD HH:mm:ss')
     })
