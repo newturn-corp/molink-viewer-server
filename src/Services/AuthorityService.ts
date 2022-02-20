@@ -7,7 +7,8 @@ import {
     HierarchyDocumentInfoInterface
 } from '@newturn-develop/types-molink'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
-import { DocumentNotExist, HierarchyNotExists } from '../Errors/DocumentError'
+import { DocumentNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
+import UserRepo from '../Repositories/UserRepo'
 
 class AuthorityService {
     checkDocumentVisible (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
@@ -58,14 +59,19 @@ class AuthorityService {
         }
         const info = content.getMap('info')
         const documentUserId = info.get('userId') as number
+        const documentUser = await UserRepo.getActiveUserById(documentUserId)
+        if (!documentUser) {
+            throw new DocumentUserNotExists()
+        }
 
         const hierarchy = await HierarchyRepo.getHierarchy(documentUserId)
         if (!hierarchy) {
             throw new HierarchyNotExists()
         }
         const hierarchyDocumentInfo = hierarchy.getMap('documentHierarchyInfoMap').get(documentId) as HierarchyDocumentInfoInterface
+
         const isFollower = viewer && await this.checkIsFollower(documentUserId, viewer.id)
-        return new GetDocumentAuthorityDTO(documentUserId, this.checkDocumentVisible(viewer, hierarchyDocumentInfo, isFollower), this.checkDocumentEditable(viewer, hierarchyDocumentInfo))
+        return new GetDocumentAuthorityDTO(documentUserId, documentUser.nickname, this.checkDocumentVisible(viewer, hierarchyDocumentInfo, isFollower), this.checkDocumentEditable(viewer, hierarchyDocumentInfo))
     }
 }
 export default new AuthorityService()

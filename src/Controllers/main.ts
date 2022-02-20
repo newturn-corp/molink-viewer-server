@@ -1,7 +1,12 @@
 import { JsonController, Get, CurrentUser, Param } from 'routing-controllers'
 import User from '../Domains/User'
 import { makeEmptyResponseMessage, makeResponseMessage } from '@newturn-develop/types-molink'
-import { DocumentHierarchyInfoNotMatching, HierarchyUserNotExists } from '../Errors/DocumentError'
+import {
+    DocumentHierarchyInfoNotMatching,
+    DocumentNotExist, DocumentUserNotExists,
+    HierarchyNotExists,
+    HierarchyUserNotExists
+} from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
 import HierarchyService from '../Services/HierarchyService'
 import ContentService from '../Services/ContentService'
@@ -21,12 +26,12 @@ export class MainController {
             const dto = await AuthorityService.getDocumentAuthorityByDocumentId(user, documentId)
             return makeResponseMessage(200, dto)
         } catch (err) {
-            if (err instanceof ContentNotExists) {
+            if (err instanceof DocumentNotExist) {
                 throw new CustomHttpError(404, 1, '문서가 존재하지 않습니다.')
-            } else if (err instanceof ContentUserNotExists) {
-                throw new CustomHttpError(404, 2, '사용자가 존재하지 않습니다.')
-            } else if (err instanceof UnauthorizedForContent) {
-                throw new CustomHttpError(409, 1, '권한이 없습니다.')
+            } else if (err instanceof HierarchyNotExists) {
+                throw new CustomHttpError(404, 2, '하이어라키가 존재하지 않습니다.')
+            } else if (err instanceof DocumentUserNotExists) {
+                throw new CustomHttpError(404, 3, '사용자가 존재하지 않습니다.')
             } else {
                 throw err
             }
