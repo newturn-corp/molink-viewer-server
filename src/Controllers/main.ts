@@ -1,17 +1,57 @@
 import { JsonController, Get, CurrentUser, Param } from 'routing-controllers'
 import User from '../Domains/User'
 import { makeEmptyResponseMessage, makeResponseMessage } from '@newturn-develop/types-molink'
-import { DocumentHierarchyInfoNotMatching, DocumentNotExist, HierarchyUserNotExists } from '../Errors/DocumentError'
+import {
+    DocumentHierarchyInfoNotMatching,
+    DocumentNotExist, DocumentUserNotExists,
+    HierarchyNotExists,
+    HierarchyUserNotExists
+} from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
 import HierarchyService from '../Services/HierarchyService'
 import ContentService from '../Services/ContentService'
 import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
+import AuthorityService from '../Services/AuthorityService'
+import UserService from '../Services/UserService'
+import { UserNotExists } from '../Errors/Common'
 
 @JsonController('')
 export class MainController {
     @Get('/health-check')
     async checkServerStatus () {
         return makeEmptyResponseMessage(200)
+    }
+
+    @Get('/users/:nickname/id')
+    async getUserIDByNickname (@Param('nickname') nickname: string) {
+        try {
+            const dto = await UserService.getUserIDByNickname(nickname)
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof UserNotExists) {
+                throw new CustomHttpError(404, 1, '문서가 존재하지 않습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/documents/:documentId/authority')
+    async getAuthority (@CurrentUser() user: User, @Param('documentId') documentId: string) {
+        try {
+            const dto = await AuthorityService.getDocumentAuthorityByDocumentId(user, documentId)
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof DocumentNotExist) {
+                throw new CustomHttpError(404, 1, '문서가 존재하지 않습니다.')
+            } else if (err instanceof HierarchyNotExists) {
+                throw new CustomHttpError(404, 2, '하이어라키가 존재하지 않습니다.')
+            } else if (err instanceof DocumentUserNotExists) {
+                throw new CustomHttpError(404, 3, '사용자가 존재하지 않습니다.')
+            } else {
+                throw err
+            }
+        }
     }
 
     @Get('/contents/:id')
@@ -32,10 +72,10 @@ export class MainController {
         }
     }
 
-    @Get('/hierarchy/:nickname')
-    async getHierarchyByNickname (@CurrentUser() user: User, @Param('nickname') nickname: string) {
+    @Get('/hierarchy/:userId')
+    async getHierarchyByNickname (@CurrentUser() user: User, @Param('userId') userIDStr: string) {
         try {
-            const data = await HierarchyService.getHierarchy(user, nickname)
+            const data = await HierarchyService.getHierarchy(user, Number(userIDStr))
             return makeResponseMessage(200, data)
         } catch (err) {
             if (err instanceof HierarchyUserNotExists) {
