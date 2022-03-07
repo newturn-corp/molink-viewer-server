@@ -31,6 +31,13 @@ class HierarchyService {
                     if (parent) {
                         parent.children.splice(document.order, 1)
                         map.set(parent.id, parent)
+                        for (const [index, childID] of parent.children.entries()) {
+                            const child = map.get(childID) as HierarchyDocumentInfoInterface
+                            if (child) {
+                                child.order = index
+                                map.set(childID, child)
+                            }
+                        }
                     }
                 }
             }
