@@ -26,6 +26,13 @@ class HierarchyService {
                     continue
                 }
                 map.delete(document.id)
+                if (document.parentId) {
+                    const parent = map.get(document.parentId) as HierarchyDocumentInfoInterface
+                    if (parent) {
+                        parent.children.splice(document.order, 1)
+                        map.set(parent.id, parent)
+                    }
+                }
             }
             newTopLevelDocumentIdList.sort((a, b) => {
                 const aDocument = map.get(a) as HierarchyDocumentInfoInterface
