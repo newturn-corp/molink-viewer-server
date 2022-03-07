@@ -17,15 +17,17 @@ class HierarchyService {
             const map = hierarchy.getMap<HierarchyDocumentInfoInterface>('documentHierarchyInfoMap')
             const topLevelDocumentIdList = hierarchy.getArray('topLevelDocumentIdList')
             const newTopLevelDocumentIdList = []
-            for (const document of map.values()) {
-                const viewable = AuthorityService.checkDocumentViewable(viewer, document, isFollower)
+            for (const page of map.values()) {
+                const viewable = AuthorityService.checkDocumentViewable(viewer, page, isFollower)
                 if (viewable) {
-                    if (!document.parentId) {
-                        newTopLevelDocumentIdList.push(document.id)
+                    if (!page.parentId) {
+                        newTopLevelDocumentIdList.push(page.id)
                     }
+                    page.childrenOpen = false
+                    map.set(page.id, page)
                     continue
                 }
-                map.delete(document.id)
+                map.delete(page.id)
             }
             for (const page of map.values()) {
                 const newChildren = page.children.filter((childID: string) => map.get(childID))
