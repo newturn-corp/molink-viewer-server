@@ -6,6 +6,7 @@ const env = {
     isProduction: process.env.NODE_ENV === 'production',
     isLocal: process.env.NODE_ENV === 'local',
     port: Number(process.env.PORT) || 8000,
+    appInstance: process.env.NODE_APP_INSTANCE,
     aws: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
