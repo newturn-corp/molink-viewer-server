@@ -5,6 +5,7 @@ import 'reflect-metadata'
 import { useMiddleware } from './Configs/middlewareConfig'
 import env from './env'
 import { Slack } from '@newturn-develop/molink-utils'
+import ip from 'ip'
 
 dotenv.config()
 Slack.init(env.slack.token)
@@ -12,7 +13,12 @@ Slack.init(env.slack.token)
 const app = express()
 useMiddleware(app)
 app.listen(env.port, () => {
-    console.log(`viewer server start at ${env.port}`)
+    try {
+        console.log(`Viewer Server Start\nIP: ${ip.address()}`)
+        Slack.sendTextMessage(`Viewer Server Start\nIP: ${ip.address()}`, env.isProduction ? 'C033BV5JDDG' : 'C033QHV6HU1')
+    } catch (err) {
+        console.log(err)
+    }
 })
 
 export default app
