@@ -14,8 +14,8 @@ const app = express()
 useMiddleware(app)
 app.listen(env.port, () => {
     try {
-        console.log(`Viewer Server Start\nIP: ${ip.address()}`)
-        Slack.sendTextMessage(`Viewer Server Start\nIP: ${ip.address()}`, env.isProduction ? 'C033BV5JDDG' : 'C033QHV6HU1')
+        console.log(`Viewer Server Start\nIP: ${ip.address()}\nInstance: ${env.appInstance}`)
+        Slack.sendTextMessage(`Viewer Server Start\nIP: ${ip.address()}\nInstance: ${env.appInstance}`, env.isProduction ? 'C033BV5JDDG' : 'C033QHV6HU1')
     } catch (err) {
         console.log(err)
     }
