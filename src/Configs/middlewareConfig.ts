@@ -22,7 +22,7 @@ export function useMiddleware (app: express.Application) {
     morgan.token('date', () => {
         return moment().format('YYYY-MM-DD HH:mm:ss')
     })
-    const logFormat = ':remote-addr [:date[clf]] ":method :url" :status :res[content-length] - :response-time ms ":user-agent"'
+    const logFormat = ':req[X-Real-IP] [:date[clf]] ":method :url" :status :res[content-length] - :response-time ms ":user-agent"'
     app.use(cookieParser(env.secret.cookie))
     app.use(session(sessionOptions()))
     app.use(morgan(logFormat))
