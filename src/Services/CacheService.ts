@@ -5,7 +5,7 @@ class CacheService {
     hierarchy: RedisConnector
 
     constructor () {
-        this.hierarchy = new RedisConnector(env.redis.hierarchy.host, env.redis.hierarchy.port, 'hierarchy-redis', true)
+        this.hierarchy = new RedisConnector(env.redis.hierarchy.host, env.redis.hierarchy.port, 'hierarchy-redis', env.isDevelopment)
         this.hierarchy.connect()
     }
 }
