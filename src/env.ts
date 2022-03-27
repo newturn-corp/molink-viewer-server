@@ -42,7 +42,7 @@ const env = {
     },
     redis: {
         hierarchy: {
-            host: process.env.HIERARHCHY_REDIS_HOST!,
+            host: process.env.HIERARCHY_REDIS_HOST!,
             port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379
         }
     },
