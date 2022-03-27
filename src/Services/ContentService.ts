@@ -9,7 +9,7 @@ import AuthorityService from './AuthorityService'
 
 class ContentService {
     public async getContent (viewer: User, documentId: string) {
-        const authority = await AuthorityService.getPageAuthorityByDocumentId(viewer, documentId)
+        const authority = await AuthorityService.getPageAuthorityByPageId(viewer, documentId)
         if (!authority.viewable) {
             throw new UnauthorizedForContent()
         }

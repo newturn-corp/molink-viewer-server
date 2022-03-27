@@ -52,7 +52,7 @@ class AuthorityService {
         return followers.map(follower => follower.id).includes(viewerId)
     }
 
-    async getPageAuthorityByDocumentId (viewer: User, pageId: string) {
+    async getPageAuthorityByPageId (viewer: User, pageId: string) {
         const content = await ContentRepo.getContent(pageId)
         if (!content) {
             throw new DocumentNotExist()

@@ -39,7 +39,25 @@ export class MainController {
     @Get('/documents/:documentId/authority')
     async getAuthority (@CurrentUser() user: User, @Param('documentId') documentId: string) {
         try {
-            const dto = await AuthorityService.getPageAuthorityByDocumentId(user, documentId)
+            const dto = await AuthorityService.getPageAuthorityByPageId(user, documentId)
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof DocumentNotExist) {
+                throw new CustomHttpError(404, 1, '문서가 존재하지 않습니다.')
+            } else if (err instanceof HierarchyNotExists) {
+                throw new CustomHttpError(404, 2, '하이어라키가 존재하지 않습니다.')
+            } else if (err instanceof DocumentUserNotExists) {
+                throw new CustomHttpError(404, 3, '사용자가 존재하지 않습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/pages/:pageId/authority')
+    async getPageAuthority (@CurrentUser() user: User, @Param('pageId') pageId: string) {
+        try {
+            const dto = await AuthorityService.getPageAuthorityByPageId(user, pageId)
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof DocumentNotExist) {
