@@ -52,31 +52,31 @@ class AuthorityService {
         return followers.map(follower => follower.id).includes(viewerId)
     }
 
-    async getDocumentAuthorityByDocumentId (viewer: User, documentId: string) {
-        const content = await ContentRepo.getContent(documentId)
+    async getPageAuthorityByDocumentId (viewer: User, pageId: string) {
+        const content = await ContentRepo.getContent(pageId)
         if (!content) {
             throw new DocumentNotExist()
         }
         const info = content.getMap('info')
-        const documentUserId = info.get('userId') as number
-        const documentUser = await UserRepo.getActiveUserById(documentUserId)
-        if (!documentUser) {
+        const pageUserId = info.get('userId') as number
+        const pageUser = await UserRepo.getActiveUserById(pageUserId)
+        if (!pageUser) {
             throw new DocumentUserNotExists()
         }
 
-        const hierarchy = await HierarchyRepo.getHierarchy(documentUserId)
+        const hierarchy = await HierarchyRepo.getHierarchy(pageUserId)
         if (!hierarchy) {
             throw new HierarchyNotExists()
         }
-        const hierarchyDocumentInfo = hierarchy.getMap('documentHierarchyInfoMap').get(documentId) as HierarchyDocumentInfoInterface
+        const hierarchyDocumentInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
 
-        const isFollower = viewer && await this.checkIsFollower(documentUserId, viewer.id)
+        const isFollower = viewer && await this.checkIsFollower(pageUserId, viewer.id)
         const viewable = this.checkDocumentViewable(viewer, hierarchyDocumentInfo, isFollower)
         const editable = this.checkDocumentEditable(viewer, hierarchyDocumentInfo)
         if (!viewable) {
             return new GetDocumentAuthorityDTO(null, null, null, viewable, editable)
         }
-        return new GetDocumentAuthorityDTO(documentUserId, documentUser.nickname, hierarchyDocumentInfo.title, viewable, editable)
+        return new GetDocumentAuthorityDTO(pageUserId, pageUser.nickname, hierarchyDocumentInfo.title, viewable, editable)
     }
 }
 export default new AuthorityService()

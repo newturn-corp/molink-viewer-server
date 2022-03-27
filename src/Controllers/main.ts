@@ -39,7 +39,7 @@ export class MainController {
     @Get('/documents/:documentId/authority')
     async getAuthority (@CurrentUser() user: User, @Param('documentId') documentId: string) {
         try {
-            const dto = await AuthorityService.getDocumentAuthorityByDocumentId(user, documentId)
+            const dto = await AuthorityService.getPageAuthorityByDocumentId(user, documentId)
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof DocumentNotExist) {

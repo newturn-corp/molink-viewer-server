@@ -2,6 +2,9 @@ import { Knex } from 'knex'
 import { getKnexClient } from '@newturn-develop/molink-utils'
 import env from '../env'
 import * as Y from 'yjs'
+import CacheService from '../Services/CacheService'
+import { HierarchyDocumentInfoInterface } from '@newturn-develop/types-molink'
+import { HierarchyNotExists } from '../Errors/DocumentError'
 
 interface HierarchyUpdate {
     id: string;
@@ -49,6 +52,20 @@ class HierarchyRepo {
             }
         })
         return document
+    }
+
+    async getHierarchyPageInfo (userId: number, pageId: string) {
+        const pageStrInRedis = await CacheService.hierarchy.get(`page-${pageId}`)
+        if (pageStrInRedis) {
+            return JSON.parse(pageStrInRedis) as HierarchyDocumentInfoInterface
+        }
+        const hierarchy = await this.getHierarchy(userId)
+        if (!hierarchy) {
+            throw new HierarchyNotExists()
+        }
+        const hierarchyPageInfo = hierarchy.getMap('documentHierarchyInfoMap').get(pageId) as HierarchyDocumentInfoInterface
+        await CacheService.hierarchy.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 1800)
+        return hierarchyPageInfo
     }
 }
 
