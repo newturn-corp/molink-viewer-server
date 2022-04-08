@@ -40,6 +40,12 @@ const env = {
             name: process.env.CONTENT_POSTGRE_DB_NAME!
         }
     },
+    redis: {
+        hierarchy: {
+            host: process.env.HIERARCHY_REDIS_HOST!,
+            port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379
+        }
+    },
     allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
 }
 
