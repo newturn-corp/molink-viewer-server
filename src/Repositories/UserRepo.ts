@@ -1,5 +1,5 @@
 import User from '../Domains/User'
-import { BaseRepo } from '@newturn-develop/molink-utils'
+import { BaseRepo, OpenSearch } from '@newturn-develop/molink-utils'
 
 class UserRepo extends BaseRepo {
     getActiveUserById (id: number): Promise<User | undefined> {

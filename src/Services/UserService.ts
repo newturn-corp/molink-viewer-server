@@ -1,6 +1,8 @@
 import UserRepo from '../Repositories/UserRepo'
 import { UserNotExists } from '../Errors/Common'
-import { GetUserIDDTO } from '@newturn-develop/types-molink'
+import { GetUserIDDTO, GetUserInfoByUserMapDTO, GetUserInfoByUserMapResponseDTO } from '@newturn-develop/types-molink'
+import ESUserRepo from '../Repositories/ESUserRepo'
+import { TooManyUserRequestError } from '../Errors/UserError'
 
 class UserService {
     async getUserIDByNickname (nickname: string) {
@@ -9,6 +11,19 @@ class UserService {
             throw new UserNotExists()
         }
         return new GetUserIDDTO(user.id)
+    }
+
+    async getUserInfoByIdMap (dto: GetUserInfoByUserMapDTO) {
+        const userIdList = [...Object.keys(dto.idMap)] as any
+        if (userIdList.length > 100) {
+            throw new TooManyUserRequestError()
+        }
+        const userInfoList = await ESUserRepo.getUserInfoListByIdList(userIdList)
+        const infoMap: any = {}
+        for (const info of userInfoList) {
+            infoMap[info.id] = info
+        }
+        return new GetUserInfoByUserMapResponseDTO(infoMap)
     }
 }
 export default new UserService()
