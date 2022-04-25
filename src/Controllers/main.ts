@@ -1,4 +1,4 @@
-import { JsonController, Get, CurrentUser, Param, Req, Body } from 'routing-controllers'
+import { JsonController, Get, CurrentUser, Param, Req, Body, QueryParam } from 'routing-controllers'
 import {
     GetUserInfoByUserMapDTO,
     GetUserPageListDTO,
@@ -128,10 +128,10 @@ export class MainController {
         }
     }
 
-    @Get('/user/pages')
-    async getUserPageList (@CurrentUser() user: User, @Body() dto: GetUserPageListDTO) {
+    @Get('/:userId/pages')
+    async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string) {
         try {
-            const arr = await BlogService.getUserPageList(user, dto)
+            const arr = await BlogService.getUserPageList(user, new GetUserPageListDTO(Number(userId), Number(from)))
             return makeResponseMessage(200, arr)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
