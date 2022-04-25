@@ -18,7 +18,7 @@ class ESUserRepo {
     }
 
     async getUserPageSummaryList (userId: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
-        const rawDocuments = await OpenSearch.select('molink-user', {
+        const rawDocuments = await OpenSearch.select('molink-page', {
             sort: [
                 {
                     lastEditedAt: {
