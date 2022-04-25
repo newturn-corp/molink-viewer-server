@@ -1,6 +1,11 @@
 import { JsonController, Get, CurrentUser, Param, Req, Body } from 'routing-controllers'
-import User from '../Domains/User'
-import { GetUserInfoByUserMapDTO, makeEmptyResponseMessage, makeResponseMessage } from '@newturn-develop/types-molink'
+import {
+    GetUserInfoByUserMapDTO,
+    GetUserPageListDTO,
+    makeEmptyResponseMessage,
+    makeResponseMessage,
+    User
+} from '@newturn-develop/types-molink'
 import {
     DocumentHierarchyInfoNotMatching,
     DocumentNotExist, DocumentUserNotExists,
@@ -16,6 +21,7 @@ import UserService from '../Services/UserService'
 import { UserNotExists } from '../Errors/Common'
 import { Request, Response } from 'express'
 import { TooManyUserRequestError } from '../Errors/UserError'
+import BlogService from '../Services/BlogService'
 
 @JsonController('')
 export class MainController {
@@ -113,6 +119,20 @@ export class MainController {
         try {
             const data = await UserService.getUserInfoByIdMap(dto)
             return makeResponseMessage(200, data)
+        } catch (err) {
+            if (err instanceof TooManyUserRequestError) {
+                throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/user/pages')
+    async getUserPageList (@CurrentUser() user: User, @Body() dto: GetUserPageListDTO) {
+        try {
+            const arr = await BlogService.getUserPageList(user, dto)
+            return makeResponseMessage(200, arr)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
                 throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')

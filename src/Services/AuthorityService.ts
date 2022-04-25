@@ -1,10 +1,10 @@
-import User from '../Domains/User'
 import ContentRepo from '../Repositories/ContentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
 import {
     DocumentVisibility,
     GetDocumentAuthorityDTO,
-    HierarchyDocumentInfoInterface
+    HierarchyDocumentInfoInterface, PageVisibility,
+    User
 } from '@newturn-develop/types-molink'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
 import { DocumentNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
@@ -17,7 +17,7 @@ class AuthorityService {
             userId: documentUserId
         } = hierarchyDocumentInfo
         // 1. 공개된 문서면 무조건 성공
-        if (visibility === DocumentVisibility.Public) {
+        if (visibility === PageVisibility.Public) {
             return true
         }
 
@@ -32,12 +32,12 @@ class AuthorityService {
         }
 
         // 4. 비공개 문서인 경우, 주인이 아니므로 무조건 실패
-        if (visibility === DocumentVisibility.Private) {
+        if (visibility === PageVisibility.Private) {
             return false
         }
 
         // 5. 친구 공개 문서인 경우
-        if (visibility === DocumentVisibility.OnlyFollower) {
+        if (visibility === PageVisibility.OnlyFollower) {
             return isFollower
         }
         throw new Error('Unhandled Document Viewable')

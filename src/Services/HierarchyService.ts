@@ -1,10 +1,10 @@
-import User from '../Domains/User'
 import {
     HierarchyNotExists
 } from '../Errors/DocumentError'
 import {
     GetHierarcyResponseDTO,
-    HierarchyDocumentInfoInterface
+    HierarchyDocumentInfoInterface,
+    User
 } from '@newturn-develop/types-molink'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
 import * as Y from 'yjs'

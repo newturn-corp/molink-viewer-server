@@ -1,7 +1,7 @@
-import User from '../Domains/User'
 import ContentRepo from '../Repositories/ContentRepo'
 import {
-    GetContentResponseDTO
+    GetContentResponseDTO,
+    User
 } from '@newturn-develop/types-molink'
 import { ContentNotExists, UnauthorizedForContent } from '../Errors/ContentError'
 import * as Y from 'yjs'
