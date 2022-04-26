@@ -115,9 +115,9 @@ export class MainController {
     }
 
     @Get('/users')
-    async getUserInfoByIDMap (@Body() dto: GetUserInfoByUserMapDTO) {
+    async getUserInfoByIDMap (@QueryParam('userIDList') userIDList: string) {
         try {
-            const data = await UserService.getUserInfoByIdMap(dto)
+            const data = await UserService.getUserInfoByIdMap(userIDList.split(',').map(Number))
             return makeResponseMessage(200, data)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {

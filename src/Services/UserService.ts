@@ -13,12 +13,11 @@ class UserService {
         return new GetUserIDDTO(user.id)
     }
 
-    async getUserInfoByIdMap (dto: GetUserInfoByUserMapDTO) {
-        const userIdList = [...Object.keys(dto.idMap)] as any
-        if (userIdList.length > 100) {
+    async getUserInfoByIdMap (userIDList: number[]) {
+        if (userIDList.length > 100) {
             throw new TooManyUserRequestError()
         }
-        const userInfoList = await ESUserRepo.getUserInfoListByIdList(userIdList)
+        const userInfoList = await ESUserRepo.getUserInfoListByIdList(userIDList)
         const infoMap: any = {}
         for (const info of userInfoList) {
             infoMap[info.id] = info
