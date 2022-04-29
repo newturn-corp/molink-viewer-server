@@ -40,6 +40,10 @@ const env = {
             name: process.env.CONTENT_POSTGRE_DB_NAME!
         }
     },
+    opensearch: {
+        domain: process.env.OPENSEARCH_DOMAIN!,
+        region: process.env.OPENSEARCH_REGION!
+    },
     redis: {
         hierarchy: {
             host: process.env.HIERARCHY_REDIS_HOST!,
