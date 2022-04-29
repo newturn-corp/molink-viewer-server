@@ -131,8 +131,8 @@ export class MainController {
     @Get('/:userId/pages')
     async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string) {
         try {
-            const arr = await BlogService.getUserPageList(user, new GetUserPageListDTO(Number(userId), Number(from)))
-            return makeResponseMessage(200, arr)
+            const dto = await BlogService.getUserPageList(user, new GetUserPageListDTO(Number(userId), Number(from)))
+            return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
                 throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')

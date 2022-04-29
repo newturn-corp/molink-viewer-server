@@ -1,4 +1,4 @@
-import { GetUserPageListDTO, PageVisibility, User } from '@newturn-develop/types-molink'
+import { GetUserPageListDTO, GetUserPageListResponseDTO, PageVisibility, User } from '@newturn-develop/types-molink'
 import AuthorityService from './AuthorityService'
 import ESPageRepo from '../Repositories/ESPageRepo'
 
@@ -20,8 +20,8 @@ class BlogService {
 
     async getUserPageList (user: User, dto: GetUserPageListDTO) {
         const maxVisibility = await this.getMaxPageVisibility(dto.userId, user)
-        const pageList = await ESPageRepo.getUserPageSummaryList(dto.userId, maxVisibility, 5, dto.from)
-        return pageList
+        const { total, documents } = await ESPageRepo.getUserPageSummaryList(dto.userId, maxVisibility, 5, dto.from)
+        return new GetUserPageListResponseDTO(total, documents)
     }
 }
 export default new BlogService()

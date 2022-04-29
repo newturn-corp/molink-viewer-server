@@ -18,7 +18,7 @@ class ESUserRepo {
     }
 
     async getUserPageSummaryList (userId: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
-        const rawDocuments = await OpenSearch.select('molink-page', {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             sort: [
                 {
                     lastEditedAt: {
@@ -48,10 +48,13 @@ class ESUserRepo {
                 }
             }
         })
-        return rawDocuments.map((raw: any) => {
-            const { _id: id, _source: source } = raw
-            return this.rawSourceToPageSummary(id, source)
-        }) as ESPageSummary[]
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source } = raw
+                return this.rawSourceToPageSummary(id, source)
+            }) as ESPageSummary[]
+        }
     }
 }
 export default new ESUserRepo()
