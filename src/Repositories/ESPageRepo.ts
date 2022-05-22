@@ -73,8 +73,8 @@ class ESUserRepo {
                 bool: {
                     must: [
                         {
-                            ids: {
-                                values: followerList
+                            terms: {
+                                userId: followerList
                             }
                         },
                         {
