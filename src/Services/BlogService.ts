@@ -1,6 +1,14 @@
-import { GetUserPageListDTO, GetUserPageListResponseDTO, PageVisibility, User } from '@newturn-develop/types-molink'
+import {
+    GetFollowPageListDTO,
+    GetPageListResponseDTO,
+    GetUserPageListDTO,
+    GetUserPageListResponseDTO,
+    PageVisibility,
+    User
+} from '@newturn-develop/types-molink'
 import AuthorityService from './AuthorityService'
 import ESPageRepo from '../Repositories/ESPageRepo'
+import FollowRepo from '../Repositories/FollowRepo'
 
 class BlogService {
     async getMaxPageVisibility (targetId: number, viewer: User | null) {
@@ -21,7 +29,14 @@ class BlogService {
     async getUserPageList (user: User, dto: GetUserPageListDTO) {
         const maxVisibility = await this.getMaxPageVisibility(dto.userId, user)
         const { total, documents } = await ESPageRepo.getUserPageSummaryList(dto.userId, maxVisibility, 5, dto.from)
-        return new GetUserPageListResponseDTO(total, documents)
+        return new GetPageListResponseDTO(total, documents)
+    }
+
+    async getFollowPageList (user: User, dto: GetFollowPageListDTO) {
+        const follows = await FollowRepo.getFollowerFollows(user.id)
+        const followIdList = follows.map(follow => follow.user_id)
+        const { total, documents } = await ESPageRepo.getFollowPageList(followIdList, 5, dto.from)
+        return new GetPageListResponseDTO(total, documents)
     }
 }
 export default new BlogService()
