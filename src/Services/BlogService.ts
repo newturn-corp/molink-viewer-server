@@ -35,7 +35,7 @@ class BlogService {
     async getFollowPageList (user: User, dto: GetFollowPageListDTO) {
         const follows = await FollowRepo.getFollowerFollows(user.id)
         const followIdList = follows.map(follow => follow.user_id)
-        const { total, documents } = await ESPageRepo.getFollowPageList(followIdList, 5, dto.from)
+        const { total, documents } = await ESPageRepo.getFollowPageList(followIdList, dto.count, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
 }

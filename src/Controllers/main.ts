@@ -143,9 +143,9 @@ export class MainController {
     }
 
     @Get('/follow-pages')
-    async getFollowPageList (@CurrentUser() user: User, @QueryParam('from') from: string) {
+    async getFollowPageList (@CurrentUser() user: User, @QueryParam('from') from: string, @QueryParam('count') count: string) {
         try {
-            const dto = await BlogService.getFollowPageList(user, new GetFollowPageListDTO(Number(from)))
+            const dto = await BlogService.getFollowPageList(user, new GetFollowPageListDTO(Number(from), Number(count)))
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
