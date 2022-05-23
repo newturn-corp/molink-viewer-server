@@ -56,5 +56,45 @@ class ESUserRepo {
             }) as ESPageSummary[]
         }
     }
+
+    async getFollowPageList (followerList: number[], size: number = 5, from: number = 0) {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
+            sort: [
+                {
+                    lastEditedAt: {
+                        order: 'desc'
+                    }
+                }
+            ],
+            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt'],
+            from,
+            size,
+            query: {
+                bool: {
+                    must: [
+                        {
+                            terms: {
+                                userId: followerList
+                            }
+                        },
+                        {
+                            range: {
+                                visibility: {
+                                    gte: this.getVisibilityToNumber(PageVisibility.OnlyFollower)
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        })
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source } = raw
+                return this.rawSourceToPageSummary(id, source)
+            }) as ESPageSummary[]
+        }
+    }
 }
 export default new ESUserRepo()

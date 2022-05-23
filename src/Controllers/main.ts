@@ -1,5 +1,6 @@
 import { JsonController, Get, CurrentUser, Param, Req, Body, QueryParam } from 'routing-controllers'
 import {
+    GetFollowPageListDTO,
     GetUserInfoByUserMapDTO,
     GetUserPageListDTO,
     makeEmptyResponseMessage,
@@ -19,7 +20,6 @@ import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '
 import AuthorityService from '../Services/AuthorityService'
 import UserService from '../Services/UserService'
 import { UserNotExists } from '../Errors/Common'
-import { Request, Response } from 'express'
 import { TooManyUserRequestError } from '../Errors/UserError'
 import BlogService from '../Services/BlogService'
 
@@ -132,6 +132,20 @@ export class MainController {
     async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string) {
         try {
             const dto = await BlogService.getUserPageList(user, new GetUserPageListDTO(Number(userId), Number(from)))
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof TooManyUserRequestError) {
+                throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/follow-pages')
+    async getFollowPageList (@CurrentUser() user: User, @QueryParam('from') from: string, @QueryParam('count') count: string) {
+        try {
+            const dto = await BlogService.getFollowPageList(user, new GetFollowPageListDTO(Number(from), Number(count)))
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
