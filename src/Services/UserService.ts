@@ -24,5 +24,17 @@ class UserService {
         }
         return new GetUserInfoByUserMapResponseDTO(infoMap)
     }
+
+    async getUserInfoByNicknameList (userNicknameList: string[]) {
+        if (userNicknameList.length > 100) {
+            throw new TooManyUserRequestError()
+        }
+        const userInfoList = await ESUserRepo.getUserInfoListByNicknameList(userNicknameList)
+        const infoMap: any = {}
+        for (const info of userInfoList) {
+            infoMap[info.id] = info
+        }
+        return new GetUserInfoByUserMapResponseDTO(infoMap)
+    }
 }
 export default new UserService()
