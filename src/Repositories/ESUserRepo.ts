@@ -40,5 +40,19 @@ class ESUserRepo {
             return this.rawSourceToUser(id, source)
         }) as ESUser[]
     }
+
+    async getUserInfoListByNicknameList (nicknameList: string[]) {
+        const rawDocuments = await OpenSearch.select('molink-user', {
+            query: {
+                terms: {
+                    nickname: nicknameList
+                }
+            }
+        })
+        return rawDocuments.map((raw: any) => {
+            const { _id: id, _source: source } = raw
+            return this.rawSourceToUser(id, source)
+        }) as ESUser[]
+    }
 }
 export default new ESUserRepo()

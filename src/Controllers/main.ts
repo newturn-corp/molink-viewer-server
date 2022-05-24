@@ -128,6 +128,20 @@ export class MainController {
         }
     }
 
+    @Get('/users/nickname-list')
+    async getUserInfoByNicknameMap (@QueryParam('userNicknameList') userNicknameList: string) {
+        try {
+            const data = await UserService.getUserInfoByNicknameList(userNicknameList.split(','))
+            return makeResponseMessage(200, data)
+        } catch (err) {
+            if (err instanceof TooManyUserRequestError) {
+                throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
     @Get('/:userId/pages')
     async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string) {
         try {
