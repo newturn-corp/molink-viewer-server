@@ -32,7 +32,7 @@ class UserService {
         const userInfoList = await ESUserRepo.getUserInfoListByNicknameList(userNicknameList)
         const infoMap: any = {}
         for (const info of userInfoList) {
-            infoMap[info.id] = info
+            infoMap[info.nickname] = info
         }
         return new GetUserInfoByUserMapResponseDTO(infoMap)
     }
