@@ -45,9 +45,9 @@ class UserService {
     }
 
     async getFollowInfo (user: User, targetUserId: number) {
+        const { count: followerCount } = await FollowRepo.getUserFollowerCount(targetUserId)
         const { count: followCount } = await FollowRepo.getUserFollowCount(targetUserId)
-        const { count: followingCount } = await FollowRepo.getUserFollowingCount(targetUserId)
-        return new GetFollowInfoResponseDTO(followCount, followingCount)
+        return new GetFollowInfoResponseDTO(followerCount, followCount)
     }
 }
 export default new UserService()

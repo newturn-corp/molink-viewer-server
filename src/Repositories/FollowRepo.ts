@@ -12,12 +12,12 @@ class FollowerRepo extends BaseRepo {
         return this._selectPlural(queryString, [userId])
     }
 
-    getUserFollowCount (userId: number): Promise<{ count: number }> {
+    getUserFollowerCount (userId: number): Promise<{ count: number }> {
         const queryString = 'SELECT COUNT(*) as count FROM FOLLOW_TB WHERE user_id = ?'
         return this._selectSingular(queryString, [userId])
     }
 
-    getUserFollowingCount (userId: number): Promise<{ count: number }> {
+    getUserFollowCount (userId: number): Promise<{ count: number }> {
         const queryString = 'SELECT COUNT(*) as count FROM FOLLOW_TB WHERE following_user_id = ?'
         return this._selectSingular(queryString, [userId])
     }
