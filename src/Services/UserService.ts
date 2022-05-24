@@ -1,8 +1,15 @@
 import UserRepo from '../Repositories/UserRepo'
 import { UserNotExists } from '../Errors/Common'
-import { GetUserIDDTO, GetUserInfoByUserMapDTO, GetUserInfoByUserMapResponseDTO } from '@newturn-develop/types-molink'
+import {
+    GetFollowInfoResponseDTO,
+    GetUserIDDTO,
+    GetUserInfoByUserMapDTO,
+    GetUserInfoByUserMapResponseDTO
+} from '@newturn-develop/types-molink'
 import ESUserRepo from '../Repositories/ESUserRepo'
 import { TooManyUserRequestError } from '../Errors/UserError'
+import FollowRepo from '../Repositories/FollowRepo'
+import User from '../Domains/User'
 
 class UserService {
     async getUserIDByNickname (nickname: string) {
@@ -35,6 +42,12 @@ class UserService {
             infoMap[info.nickname] = info
         }
         return new GetUserInfoByUserMapResponseDTO(infoMap)
+    }
+
+    async getFollowInfo (user: User, targetUserId: number) {
+        const { count: followCount } = await FollowRepo.getUserFollowCount(targetUserId)
+        const { count: followingCount } = await FollowRepo.getUserFollowingCount(targetUserId)
+        return new GetFollowInfoResponseDTO(followCount, followingCount)
     }
 }
 export default new UserService()

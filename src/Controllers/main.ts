@@ -142,6 +142,12 @@ export class MainController {
         }
     }
 
+    @Get('/users/:userId/follow-info')
+    async getFollowInfo (@CurrentUser() user: User, @Param('userId') userId: string) {
+        const dto = await UserService.getFollowInfo(user, Number(userId))
+        return makeResponseMessage(200, dto)
+    }
+
     @Get('/:userId/pages')
     async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string) {
         try {
