@@ -21,6 +21,11 @@ class FollowerRepo extends BaseRepo {
         const queryString = 'SELECT COUNT(*) as count FROM FOLLOW_TB WHERE following_user_id = ?'
         return this._selectSingular(queryString, [userId])
     }
+
+    checkUserFollow (userId: number, targetUserId: number) {
+        const queryString = 'SELECT * FROM FOLLOW_TB WHERE user_id = ? AND following_user_id = ?'
+        return this._check(queryString, [targetUserId, userId])
+    }
 }
 
 export default new FollowerRepo()
