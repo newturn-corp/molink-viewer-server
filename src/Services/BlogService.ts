@@ -28,7 +28,7 @@ class BlogService {
 
     async getUserPageList (user: User, dto: GetUserPageListDTO) {
         const maxVisibility = await this.getMaxPageVisibility(dto.userId, user)
-        const { total, documents } = await ESPageRepo.getUserPageSummaryList(dto.userId, maxVisibility, 5, dto.from)
+        const { total, documents } = await ESPageRepo.getUserPageSummaryList(dto.userId, maxVisibility, 6, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
 

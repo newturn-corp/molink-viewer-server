@@ -1,4 +1,4 @@
-import { JsonController, Get, CurrentUser, Param, Req, Body, QueryParam } from 'routing-controllers'
+import { JsonController, Get, CurrentUser, Param, Req, Body, QueryParam, Authorized } from 'routing-controllers'
 import {
     GetFollowPageListDTO,
     GetUserInfoByUserMapDTO,
@@ -140,6 +140,19 @@ export class MainController {
                 throw err
             }
         }
+    }
+
+    @Get('/users/:userId/follow-info')
+    async getFollowInfo (@CurrentUser() user: User, @Param('userId') userId: string) {
+        const dto = await UserService.getFollowInfo(user, Number(userId))
+        return makeResponseMessage(200, dto)
+    }
+
+    @Get('/users/:userId/follow-status')
+    @Authorized()
+    async getFollowStatus (@CurrentUser() user: User, @Param('userId') userId: string) {
+        const dto = await UserService.getFollowStatus(user, Number(userId))
+        return makeResponseMessage(200, dto)
     }
 
     @Get('/:userId/pages')
