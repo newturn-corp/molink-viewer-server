@@ -3,11 +3,11 @@ import { ESPageSummary, ESUser, PageVisibility, ESPageSummaryWithVisibility } fr
 
 class ESUserRepo {
     rawSourceToPageSummary (id: string, source: any) {
-        return new ESPageSummary(id, source.title, source.userId, source.image, source.description, source.lastEditedAt)
+        return new ESPageSummary(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.like)
     }
 
     rawSourceToPageSummaryWithVisibility (id: string, source: any) {
-        return new ESPageSummaryWithVisibility(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.visibility)
+        return new ESPageSummaryWithVisibility(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.like, source.visibility)
     }
 
     getVisibilityToNumber (visibility: PageVisibility) {
@@ -30,7 +30,7 @@ class ESUserRepo {
                     }
                 }
             ],
-            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt'],
+            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like'],
             from,
             size,
             query: {
@@ -70,7 +70,7 @@ class ESUserRepo {
                     }
                 }
             ],
-            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt'],
+            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like'],
             from,
             size,
             query: {

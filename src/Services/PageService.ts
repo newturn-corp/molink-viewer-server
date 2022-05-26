@@ -2,6 +2,8 @@ import ESPageRepo from '../Repositories/ESPageRepo'
 import User from '../Domains/User'
 import { PageNotExists, UnauthorizedForPage } from '../Errors/PageError'
 import AuthorityService from './AuthorityService'
+import LikeRepo from '../Repositories/LikeRepo'
+import { GetUserLikePageResponseDTO, GetUserPageListResponseDTO } from '@newturn-develop/types-molink'
 
 class PageService {
     async getPageSummary (user: User, pageId: string) {
@@ -15,6 +17,11 @@ class PageService {
             throw new UnauthorizedForPage()
         }
         return pageSummary.toNormalSummary()
+    }
+
+    async getUserLikePage (user: User, pageId: string) {
+        const isLike = await LikeRepo.checkActiveLikeExists(pageId, user.id)
+        return new GetUserLikePageResponseDTO(isLike)
     }
 }
 export default new PageService()
