@@ -103,9 +103,8 @@ class ESUserRepo {
 
     // TODO: get은 Page 전체를 가져오므로 field를 필터링해야할 필요가 있음
     async getPageSummaryWithVisibility (pageID: string) {
-        const rawDocument = await OpenSearch.get('molink-page', pageID)
-        const { _id: id, _source: source } = rawDocument
-        return this.rawSourceToPageSummaryWithVisibility(id, source)
+        const source = await OpenSearch.get('molink-page', pageID)
+        return this.rawSourceToPageSummaryWithVisibility(pageID, source)
     }
 
     async getPageSummaryListByIDList (idList: string[]) {
