@@ -42,6 +42,13 @@ export class PageController {
             }
         }
     }
+
+    @Get('/:id/like')
+    @Authorized()
+    async getUserPageLike (@CurrentUser() user: User, @Param('id') id: string) {
+        const dto = await PageService.getUserLikePage(user, id)
+        return makeResponseMessage(200, dto)
+    }
 }
 
 export default PageController
