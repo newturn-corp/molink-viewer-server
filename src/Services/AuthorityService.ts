@@ -1,7 +1,7 @@
 import ContentRepo from '../Repositories/ContentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
 import {
-    DocumentVisibility,
+    DocumentVisibility, ESPageSummary, ESPageSummaryWithVisibility,
     GetDocumentAuthorityDTO,
     HierarchyDocumentInfoInterface, PageVisibility,
     User
@@ -9,9 +9,10 @@ import {
 import HierarchyRepo from '../Repositories/HierarchyRepo'
 import { DocumentNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
 import UserRepo from '../Repositories/UserRepo'
+import { numberToPageVisibility } from '../Utils/NumberToPageVisibility'
 
 class AuthorityService {
-    checkDocumentViewable (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
+    checkPageViewable (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
         const {
             visibility,
             userId: documentUserId
@@ -43,6 +44,36 @@ class AuthorityService {
         throw new Error('Unhandled Document Viewable')
     }
 
+    checkPageViewableForESSummary (viewer: User, summary: ESPageSummaryWithVisibility, isFollower: boolean) {
+        const { visibility: visibilityNumber } = summary
+        const visibility = numberToPageVisibility(visibilityNumber)
+        // 1. 공개된 문서면 무조건 성공
+        if (visibility === PageVisibility.Public) {
+            return true
+        }
+
+        // 2. 로그인 하지 않은 경우, 공개된 문서가 아니므로 무조건 실패
+        if (!viewer) {
+            return false
+        }
+
+        // 3. 주인인 경우 무조건 성공
+        if (Number(summary.userId) === viewer.id) {
+            return true
+        }
+
+        // 4. 비공개 문서인 경우, 주인이 아니므로 무조건 실패
+        if (visibility === PageVisibility.Private) {
+            return false
+        }
+
+        // 5. 친구 공개 문서인 경우
+        if (visibility === PageVisibility.OnlyFollower) {
+            return isFollower
+        }
+        throw new Error('Unhandled Page Visibility')
+    }
+
     checkDocumentEditable (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface) {
         return viewer.id === hierarchyDocumentInfo.userId
     }
@@ -71,7 +102,7 @@ class AuthorityService {
         const hierarchyDocumentInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
 
         const isFollower = viewer && await this.checkIsFollower(pageUserId, viewer.id)
-        const viewable = this.checkDocumentViewable(viewer, hierarchyDocumentInfo, isFollower)
+        const viewable = this.checkPageViewable(viewer, hierarchyDocumentInfo, isFollower)
         const editable = this.checkDocumentEditable(viewer, hierarchyDocumentInfo)
         if (!viewable) {
             return new GetDocumentAuthorityDTO(null, null, null, viewable, editable)

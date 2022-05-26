@@ -18,7 +18,7 @@ class HierarchyService {
             const topLevelDocumentIdList = hierarchy.getArray('topLevelDocumentIdList')
             const newTopLevelDocumentIdList = []
             for (const page of map.values()) {
-                const viewable = AuthorityService.checkDocumentViewable(viewer, page, isFollower)
+                const viewable = AuthorityService.checkPageViewable(viewer, page, isFollower)
                 if (viewable) {
                     if (!page.parentId) {
                         newTopLevelDocumentIdList.push(page.id)
