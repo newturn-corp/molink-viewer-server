@@ -45,7 +45,7 @@ class ESUserRepo {
         const rawDocuments = await OpenSearch.select('molink-user', {
             query: {
                 terms: {
-                    nickname: nicknameList
+                    'nickname.keyword': nicknameList
                 }
             }
         })
