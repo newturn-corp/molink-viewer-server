@@ -7,20 +7,17 @@ class ESCommentRepo {
     }
 
     async getPageComments (pageId: string) {
-        const { total, documents } = await OpenSearch.select('molink-comment', {
+        const comments = await OpenSearch.select('molink-comment', {
             query: {
                 term: {
                     pageId
                 }
             }
         })
-        return {
-            total,
-            documents: documents.map((raw: any) => {
-                const { _id: id, _source: source } = raw
-                return this.rawSourceToComment(id, source)
-            }) as ESComment[]
-        }
+        return comments.map((raw: any) => {
+            const { _id: id, _source: source } = raw
+            return this.rawSourceToComment(id, source)
+        }) as ESComment[]
     }
 }
 export default new ESCommentRepo()
