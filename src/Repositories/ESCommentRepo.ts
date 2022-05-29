@@ -7,7 +7,7 @@ class ESCommentRepo {
     }
 
     async getPageComments (pageId: string) {
-        const { total, documents } = await OpenSearch.select('molink-page', {
+        const { total, documents } = await OpenSearch.select('molink-comment', {
             query: {
                 term: {
                     pageId
