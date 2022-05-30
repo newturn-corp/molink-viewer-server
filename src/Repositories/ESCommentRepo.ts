@@ -3,7 +3,7 @@ import { OpenSearch } from '@newturn-develop/molink-utils'
 
 class ESCommentRepo {
     rawSourceToComment (id: string, source: any) {
-        return new ESComment(id, source.pageId, source.userId, source.content, source.parentCommentId, source.createdAt, source.deletedAt)
+        return new ESComment(id, source.pageId, source.userId, source.content, source.parentCommentId, source.like, source.createdAt, source.deletedAt)
     }
 
     async getPageComments (pageId: string) {
