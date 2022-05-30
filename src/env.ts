@@ -44,6 +44,9 @@ const env = {
         domain: process.env.OPENSEARCH_DOMAIN!,
         region: process.env.OPENSEARCH_REGION!
     },
+    api: {
+        url: process.env.API_SERVER_BASE_URL
+    },
     redis: {
         hierarchy: {
             host: process.env.HIERARCHY_REDIS_HOST!,

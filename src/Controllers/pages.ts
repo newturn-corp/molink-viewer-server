@@ -1,29 +1,14 @@
-import { JsonController, Get, CurrentUser, Param, Req, Body, QueryParam, Authorized } from 'routing-controllers'
+import { JsonController, Get, CurrentUser, Param, Req, Authorized } from 'routing-controllers'
 import {
-    GetFollowPageListDTO,
-    GetUserInfoByUserMapDTO,
-    GetUserPageListDTO,
-    makeEmptyResponseMessage,
     makeResponseMessage,
     User
 } from '@newturn-develop/types-molink'
-import {
-    DocumentHierarchyInfoNotMatching,
-    DocumentNotExist, DocumentUserNotExists,
-    HierarchyNotExists,
-    HierarchyUserNotExists
-} from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
-import HierarchyService from '../Services/HierarchyService'
-import ContentService from '../Services/ContentService'
-import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
-import AuthorityService from '../Services/AuthorityService'
-import UserService from '../Services/UserService'
-import { UserNotExists } from '../Errors/Common'
-import { TooManyUserRequestError } from '../Errors/UserError'
-import BlogService from '../Services/BlogService'
 import PageService from '../Services/PageService'
 import { PageNotExists, UnauthorizedForPage } from '../Errors/PageError'
+import { CommentService } from '../Services/CommentService'
+import { ViewerAPI } from '../API/ViewerAPI'
+import { Request } from 'express'
 
 @JsonController('/pages')
 export class PageController {
@@ -48,6 +33,21 @@ export class PageController {
     async getUserPageLike (@CurrentUser() user: User, @Param('id') id: string) {
         const dto = await PageService.getUserLikePage(user, id)
         return makeResponseMessage(200, dto)
+    }
+
+    @Get('/:id/comments')
+    async getPageComments (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
+        try {
+            const service = new CommentService(new ViewerAPI(req))
+            const arr = await service.getPageComments(user, id)
+            return makeResponseMessage(200, arr)
+        } catch (err) {
+            if (err instanceof UnauthorizedForPage) {
+                throw new CustomHttpError(403, 0, '권한이 없습니다.')
+            } else {
+                throw err
+            }
+        }
     }
 }
 
