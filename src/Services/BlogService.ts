@@ -1,5 +1,5 @@
 import {
-    GetFollowPageListDTO,
+    GetFollowPageListDTO, GetPageListDTO,
     GetPageListResponseDTO,
     GetUserPageListDTO,
     GetUserPageListResponseDTO,
@@ -9,6 +9,7 @@ import {
 import AuthorityService from './AuthorityService'
 import ESPageRepo from '../Repositories/ESPageRepo'
 import FollowRepo from '../Repositories/FollowRepo'
+import { TooManyPageRequestError } from '../Errors/PageError'
 
 class BlogService {
     async getMaxPageVisibility (targetId: number, viewer: User | null) {
@@ -36,6 +37,14 @@ class BlogService {
         const follows = await FollowRepo.getFollowerFollows(user.id)
         const followIdList = follows.map(follow => follow.user_id)
         const { total, documents } = await ESPageRepo.getFollowPageList(followIdList, dto.count, dto.from)
+        return new GetPageListResponseDTO(total, documents)
+    }
+
+    async getPopularPageList (dto: GetPageListDTO) {
+        if (dto.count > 20) {
+            throw new TooManyPageRequestError()
+        }
+        const { total, documents } = await ESPageRepo.getPopularPageList(dto.count, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
 }

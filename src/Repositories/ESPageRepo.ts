@@ -120,5 +120,50 @@ class ESUserRepo {
             return this.rawSourceToPageSummary(id, source)
         }) as ESPageSummary[]
     }
+
+    async getPopularPageList (size: number = 5, from: number = 0) {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
+            sort: [
+                {
+                    _script: {
+                        type: 'number',
+                        script: {
+                            lang: 'painless',
+                            source: "(500.0 + 200.0 * doc['like'].value) / ((params.now - doc['lastPublishedAt'].value) / 86400000.0 + 15.0)",
+                            params: {
+                                now: Number(new Date())
+                            }
+                        },
+                        order: 'desc'
+                    }
+                }
+            ],
+            query: {
+                bool: {
+                    must: [
+                        {
+                            term: {
+                                visibility: {
+                                    value: 2
+                                }
+                            }
+                        },
+                        {
+                            exists: {
+                                field: 'lastPublishedAt'
+                            }
+                        }
+                    ]
+                }
+            }
+        })
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source } = raw
+                return this.rawSourceToPageSummary(id, source)
+            }) as ESPageSummary[]
+        }
+    }
 }
 export default new ESUserRepo()
