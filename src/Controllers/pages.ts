@@ -1,6 +1,6 @@
 import { JsonController, Get, CurrentUser, Param, Req, Authorized, QueryParam } from 'routing-controllers'
 import {
-    GetPageListDTO,
+    GetPageListDTO, GetUserPageListDTO,
     makeResponseMessage,
     User
 } from '@newturn-develop/types-molink'
@@ -11,6 +11,7 @@ import { CommentService } from '../Services/CommentService'
 import { ViewerAPI } from '../API/ViewerAPI'
 import { Request } from 'express'
 import BlogService from '../Services/BlogService'
+import { TooManyUserRequestError } from '../Errors/UserError'
 
 @JsonController('/pages')
 export class PageController {
@@ -46,20 +47,6 @@ export class PageController {
         } catch (err) {
             if (err instanceof UnauthorizedForPage) {
                 throw new CustomHttpError(403, 0, '권한이 없습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/popular-list')
-    async getPopularPageList (@QueryParam('from') from: string, @QueryParam('count') count: string) {
-        try {
-            const dto = await BlogService.getPopularPageList(new GetPageListDTO(Number(from), Number(count)))
-            return makeResponseMessage(200, dto)
-        } catch (err) {
-            if (err instanceof TooManyPageRequestError) {
-                throw new CustomHttpError(409, 0, '너무 많은 페이지를 요청했습니다.')
             } else {
                 throw err
             }

@@ -107,20 +107,6 @@ class ESUserRepo {
         return this.rawSourceToPageSummaryWithVisibility(pageID, source)
     }
 
-    async getPageSummaryListByIDList (idList: string[]) {
-        const rawDocuments = await OpenSearch.select('molink-page', {
-            query: {
-                ids: {
-                    values: idList.map(id => id.toString())
-                }
-            }
-        })
-        return rawDocuments.map((raw: any) => {
-            const { _id: id, _source: source } = raw
-            return this.rawSourceToPageSummary(id, source)
-        }) as ESPageSummary[]
-    }
-
     async getPopularPageList (size: number = 5, from: number = 0) {
         const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             sort: [
@@ -138,6 +124,9 @@ class ESUserRepo {
                     }
                 }
             ],
+            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt'],
+            from,
+            size,
             query: {
                 bool: {
                     must: [
