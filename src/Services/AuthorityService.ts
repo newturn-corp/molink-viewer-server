@@ -7,7 +7,7 @@ import {
     User
 } from '@newturn-develop/types-molink'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
-import { DocumentNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
+import { PageNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
 import UserRepo from '../Repositories/UserRepo'
 import { numberToPageVisibility } from '../Utils/NumberToPageVisibility'
 
@@ -86,7 +86,7 @@ class AuthorityService {
     async getPageAuthorityByPageId (viewer: User, pageId: string) {
         const content = await ContentRepo.getContent(pageId)
         if (!content) {
-            throw new DocumentNotExist()
+            throw new PageNotExist()
         }
         const info = content.getMap('info')
         const pageUserId = info.get('userId') as number
@@ -99,15 +99,18 @@ class AuthorityService {
         if (!hierarchy) {
             throw new HierarchyNotExists()
         }
-        const hierarchyDocumentInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
+        const hierarchyPageInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
+        if (!hierarchyPageInfo) {
+            throw new PageNotExist()
+        }
 
         const isFollower = viewer && await this.checkIsFollower(pageUserId, viewer.id)
-        const viewable = this.checkPageViewable(viewer, hierarchyDocumentInfo, isFollower)
-        const editable = this.checkDocumentEditable(viewer, hierarchyDocumentInfo)
+        const viewable = this.checkPageViewable(viewer, hierarchyPageInfo, isFollower)
+        const editable = this.checkDocumentEditable(viewer, hierarchyPageInfo)
         if (!viewable) {
             return new GetDocumentAuthorityDTO(null, null, null, viewable, editable)
         }
-        return new GetDocumentAuthorityDTO(pageUserId, pageUser.nickname, hierarchyDocumentInfo.title, viewable, editable)
+        return new GetDocumentAuthorityDTO(pageUserId, pageUser.nickname, hierarchyPageInfo.title, viewable, editable)
     }
 }
 export default new AuthorityService()

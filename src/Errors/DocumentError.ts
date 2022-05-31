@@ -1,6 +1,6 @@
 import { CustomError } from './Common'
 
-export class DocumentNotExist extends CustomError {}
+export class PageNotExist extends CustomError {}
 
 export class HierarchyUserNotExists extends CustomError {}
 
