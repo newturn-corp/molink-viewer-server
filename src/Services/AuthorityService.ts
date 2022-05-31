@@ -95,10 +95,6 @@ class AuthorityService {
             throw new DocumentUserNotExists()
         }
 
-        const hierarchy = await HierarchyRepo.getHierarchy(pageUserId)
-        if (!hierarchy) {
-            throw new HierarchyNotExists()
-        }
         const hierarchyPageInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
         if (!hierarchyPageInfo) {
             throw new PageNotExist()
