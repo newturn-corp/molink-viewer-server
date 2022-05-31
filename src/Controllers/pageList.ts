@@ -44,7 +44,7 @@ export class PageListController {
     @Get('/:userId')
     async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string, @QueryParam('count') count: string) {
         try {
-            const dto = await PageListService.getUserPageList(user, Number(userId), new GetPageListDTO(Number(userId), Number(from)))
+            const dto = await PageListService.getUserPageList(user, Number(userId), new GetPageListDTO(Number(from), Number(count)))
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
