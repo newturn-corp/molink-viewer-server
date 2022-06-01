@@ -11,7 +11,7 @@ import ESPageRepo from '../Repositories/ESPageRepo'
 import FollowRepo from '../Repositories/FollowRepo'
 import { TooManyPageRequestError } from '../Errors/PageError'
 
-class BlogService {
+class PageListService {
     async getMaxPageVisibility (targetId: number, viewer: User | null) {
         if (!viewer) {
             return PageVisibility.Public
@@ -36,7 +36,7 @@ class BlogService {
         return new GetPageListResponseDTO(total, documents)
     }
 
-    async getFollowPageList (user: User, dto: GetFollowPageListDTO) {
+    async getFollowPageList (user: User, dto: GetPageListDTO) {
         const follows = await FollowRepo.getFollowerFollows(user.id)
         const followIdList = follows.map(follow => follow.user_id)
         const { total, documents } = await ESPageRepo.getFollowPageList(followIdList, dto.count, dto.from)
@@ -51,4 +51,4 @@ class BlogService {
         return new GetPageListResponseDTO(total, documents)
     }
 }
-export default new BlogService()
+export default new PageListService()
