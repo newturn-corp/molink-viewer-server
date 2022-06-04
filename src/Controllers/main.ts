@@ -15,13 +15,14 @@ import {
 } from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
 import HierarchyService from '../Services/HierarchyService'
-import ContentService from '../Services/ContentService'
 import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
 import AuthorityService from '../Services/AuthorityService'
 import UserService from '../Services/UserService'
 import { UserNotExists } from '../Errors/Common'
 import { TooManyUserRequestError } from '../Errors/UserError'
-import BlogService from '../Services/BlogService'
+import { Request } from 'express'
+import { ViewerAPI } from '../API/ViewerAPI'
+import { ContentService } from '../Services/ContentService'
 
 @JsonController('')
 export class MainController {
@@ -81,9 +82,10 @@ export class MainController {
     }
 
     @Get('/contents/:id')
-    async getContent (@CurrentUser() user: User, @Param('id') id: string) {
+    async getContent (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
         try {
-            const dto = await ContentService.getContent(user, id)
+            const contentService = new ContentService(new ViewerAPI(req))
+            const dto = await contentService.getContent(user, id)
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof ContentNotExists) {
