@@ -8,12 +8,12 @@ import * as Y from 'yjs'
 import AuthorityService from './AuthorityService'
 
 class ContentService {
-    public async getContent (viewer: User, documentId: string) {
-        const authority = await AuthorityService.getPageAuthorityByPageId(viewer, documentId)
+    public async getContent (viewer: User, pageId: string) {
+        const authority = await AuthorityService.getPageAuthorityByPageId(viewer, pageId)
         if (!authority.viewable) {
             throw new UnauthorizedForContent()
         }
-        const content = await ContentRepo.getContent(documentId)
+        const content = await ContentRepo.getContent(pageId)
         if (!content) {
             throw new ContentNotExists()
         }
