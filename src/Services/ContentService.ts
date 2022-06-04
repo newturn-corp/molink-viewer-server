@@ -1,23 +1,28 @@
-import ContentRepo from '../Repositories/ContentRepo'
 import {
-    GetContentResponseDTO,
     User
 } from '@newturn-develop/types-molink'
 import { ContentNotExists, UnauthorizedForContent } from '../Errors/ContentError'
-import * as Y from 'yjs'
-import AuthorityService from './AuthorityService'
+import { ViewerAPI } from '../API/ViewerAPI'
+import ESPageRepo from '../Repositories/ESPageRepo'
 
-class ContentService {
-    public async getContent (viewer: User, documentId: string) {
-        const authority = await AuthorityService.getPageAuthorityByPageId(viewer, documentId)
-        if (!authority.viewable) {
+export class ContentService {
+    viewerAPI: ViewerAPI
+
+    constructor (viewerAPI: ViewerAPI) {
+        this.viewerAPI = viewerAPI
+    }
+
+    public async getContent (viewer: User, pageId: string) {
+        const viewable = (await this.viewerAPI.getPageAuthority(pageId)).viewable
+        if (!viewable) {
             throw new UnauthorizedForContent()
         }
-        const content = await ContentRepo.getContent(documentId)
+        const content = await ESPageRepo.getPageRawContent(pageId)
         if (!content) {
             throw new ContentNotExists()
         }
-        return new GetContentResponseDTO(Array.from(Y.encodeStateAsUpdate(content)))
+        return {
+            rawContent: content
+        }
     }
 }
-export default new ContentService()

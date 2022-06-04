@@ -1,6 +1,8 @@
 import { OpenSearch } from '@newturn-develop/molink-utils'
 import { ESPageSummary, ESUser, PageVisibility, ESPageSummaryWithVisibility } from '@newturn-develop/types-molink'
 
+const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt']
+
 class ESUserRepo {
     rawSourceToPageSummary (id: string, source: any) {
         return new ESPageSummary(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.like, source.commentCount, source.lastPublishedAt)
@@ -30,7 +32,7 @@ class ESUserRepo {
                     }
                 }
             ],
-            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt'],
+            _source: summaryFields,
             from,
             size,
             query: {
@@ -70,7 +72,7 @@ class ESUserRepo {
                     }
                 }
             ],
-            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt'],
+            _source: summaryFields,
             from,
             size,
             query: {
@@ -101,10 +103,11 @@ class ESUserRepo {
         }
     }
 
-    // TODO: get은 Page 전체를 가져오므로 field를 필터링해야할 필요가 있음
     async getPageSummaryWithVisibility (pageID: string) {
-        const source = await OpenSearch.get('molink-page', pageID)
-        return this.rawSourceToPageSummaryWithVisibility(pageID, source)
+        const source = await OpenSearch.get('molink-page', pageID, {
+            includeFields: [...summaryFields, 'visibility']
+        })
+        return source && this.rawSourceToPageSummaryWithVisibility(pageID, source)
     }
 
     async getPopularPageList (size: number = 5, from: number = 0) {
@@ -153,6 +156,13 @@ class ESUserRepo {
                 return this.rawSourceToPageSummary(id, source)
             }) as ESPageSummary[]
         }
+    }
+
+    async getPageRawContent (pageID: string) {
+        const source = await OpenSearch.get('molink-page', pageID, {
+            includeFields: ['rawContent']
+        })
+        return source && source.rawContent
     }
 }
 export default new ESUserRepo()

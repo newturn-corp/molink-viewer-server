@@ -10,6 +10,10 @@ import HierarchyRepo from '../Repositories/HierarchyRepo'
 import { PageNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
 import UserRepo from '../Repositories/UserRepo'
 import { numberToPageVisibility } from '../Utils/NumberToPageVisibility'
+import CacheService from './CacheService'
+import { Slack } from '@newturn-develop/molink-utils'
+import env from '../env'
+import { UserNotExists } from '../Errors/Common'
 
 class AuthorityService {
     checkPageViewable (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
@@ -83,7 +87,15 @@ class AuthorityService {
         return followers.map(follower => follower.id).includes(viewerId)
     }
 
-    async getPageAuthorityByPageId (viewer: User, pageId: string) {
+    async getPageHierarchyInfo (pageId: string): Promise<HierarchyDocumentInfoInterface> {
+        try {
+            const rawPage = await CacheService.hierarchy.get(`page-${pageId}`)
+            if (rawPage) {
+                return JSON.parse(rawPage)
+            }
+        } catch (err) {
+            await Slack.sendTextMessage('Redis Error In Viewer Server', env.isProduction ? 'C02SE9VA8TC' : 'C02TWKQHJ64')
+        }
         const content = await ContentRepo.getContent(pageId)
         if (!content) {
             throw new PageNotExist()
@@ -98,6 +110,21 @@ class AuthorityService {
         const hierarchyPageInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
         if (!hierarchyPageInfo) {
             throw new PageNotExist()
+        }
+        try {
+            await CacheService.hierarchy.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 1800)
+        } catch (err) {
+            await Slack.sendTextMessage('Redis Error In Viewer Server', env.isProduction ? 'C02SE9VA8TC' : 'C02TWKQHJ64')
+        }
+        return hierarchyPageInfo
+    }
+
+    async getPageAuthorityByPageId (viewer: User, pageId: string) {
+        const hierarchyPageInfo = await this.getPageHierarchyInfo(pageId)
+        const pageUserId = hierarchyPageInfo.userId
+        const pageUser = await UserRepo.getActiveUserById(pageUserId)
+        if (!pageUser) {
+            throw new UserNotExists()
         }
 
         const isFollower = viewer && await this.checkIsFollower(pageUserId, viewer.id)
