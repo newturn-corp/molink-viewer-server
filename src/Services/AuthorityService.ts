@@ -48,8 +48,7 @@ class AuthorityService {
         throw new Error('Unhandled Document Viewable')
     }
 
-    checkPageViewableForESSummary (viewer: User, summary: ESPageSummaryWithVisibility, isFollower: boolean) {
-        const { visibility: visibilityNumber } = summary
+    checkPageViewableForESSummary (viewer: User, pageOwnerID: number, visibilityNumber: number, isFollower: boolean) {
         const visibility = numberToPageVisibility(visibilityNumber)
         // 1. 공개된 문서면 무조건 성공
         if (visibility === PageVisibility.Public) {
@@ -62,7 +61,7 @@ class AuthorityService {
         }
 
         // 3. 주인인 경우 무조건 성공
-        if (Number(summary.userId) === viewer.id) {
+        if (pageOwnerID === viewer.id) {
             return true
         }
 

@@ -1,22 +1,39 @@
 import ESPageRepo from '../Repositories/ESPageRepo'
 import User from '../Domains/User'
 import { PageNotExists, UnauthorizedForPage } from '../Errors/PageError'
-import AuthorityService from './AuthorityService'
 import LikeRepo from '../Repositories/LikeRepo'
-import { GetUserLikePageResponseDTO, GetUserPageListResponseDTO } from '@newturn-develop/types-molink'
+import { GetUserLikePageResponseDTO } from '@newturn-develop/types-molink'
+import { ViewerAPI } from '../API/ViewerAPI'
 
-class PageService {
+export class PageService {
+    viewerAPI: ViewerAPI
+
+    constructor (viewerAPI: ViewerAPI) {
+        this.viewerAPI = viewerAPI
+    }
+
     async getPageSummary (user: User, pageId: string) {
+        const authority = await this.viewerAPI.getPageAuthority(pageId)
+        if (!authority.viewable) {
+            throw new UnauthorizedForPage()
+        }
         const pageSummary = await ESPageRepo.getPageSummaryWithVisibility(pageId)
         if (!pageSummary) {
             throw new PageNotExists()
         }
-        const isFollower = user && await AuthorityService.checkIsFollower(Number(pageSummary.userId), user.id)
-        const viewable = AuthorityService.checkPageViewableForESSummary(user, pageSummary, isFollower)
-        if (!viewable) {
+        return pageSummary.toNormalSummary()
+    }
+
+    async getPageMetaInfo (user: User, pageId: string) {
+        const authority = await this.viewerAPI.getPageAuthority(pageId)
+        if (!authority.viewable) {
             throw new UnauthorizedForPage()
         }
-        return pageSummary.toNormalSummary()
+        const pageMetaInfo = await ESPageRepo.getPageMetaInfo(pageId)
+        if (!pageMetaInfo) {
+            throw new PageNotExists()
+        }
+        return pageMetaInfo
     }
 
     async getUserLikePage (user: User, pageId: string) {
@@ -24,4 +41,3 @@ class PageService {
         return new GetUserLikePageResponseDTO(isLike)
     }
 }
-export default new PageService()
