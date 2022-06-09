@@ -1,5 +1,11 @@
 import { OpenSearch } from '@newturn-develop/molink-utils'
-import { ESPageSummary, ESUser, PageVisibility, ESPageSummaryWithVisibility } from '@newturn-develop/types-molink'
+import {
+    ESPageSummary,
+    ESUser,
+    PageVisibility,
+    ESPageSummaryWithVisibility,
+    ESPageMetaInfo
+} from '@newturn-develop/types-molink'
 
 const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt']
 
@@ -10,6 +16,10 @@ class ESUserRepo {
 
     rawSourceToPageSummaryWithVisibility (id: string, source: any) {
         return new ESPageSummaryWithVisibility(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.like, source.commentCount, source.lastPublishedAt, source.visibility)
+    }
+
+    rawSourceToPageMetaInfo (id: string, source: any) {
+        return new ESPageMetaInfo(source.title, source.userId, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility)
     }
 
     getVisibilityToNumber (visibility: PageVisibility) {
@@ -103,11 +113,18 @@ class ESUserRepo {
         }
     }
 
-    async getPageSummaryWithVisibility (pageID: string) {
+    async getPageSummaryWithVisibility (pageID: string): Promise<ESPageSummaryWithVisibility> {
         const source = await OpenSearch.get('molink-page', pageID, {
             includeFields: [...summaryFields, 'visibility']
         })
         return source && this.rawSourceToPageSummaryWithVisibility(pageID, source)
+    }
+
+    async getPageMetaInfo (pageID: string): Promise<ESPageMetaInfo> {
+        const source = await OpenSearch.get('molink-page', pageID, {
+            includeFields: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'lastPublishedAt', 'tags', 'visibility']
+        })
+        return source && this.rawSourceToPageMetaInfo(pageID, source)
     }
 
     async getPopularPageList (size: number = 5, from: number = 0) {
