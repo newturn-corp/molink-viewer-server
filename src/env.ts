@@ -48,6 +48,10 @@ const env = {
         url: process.env.API_SERVER_BASE_URL
     },
     redis: {
+        main: {
+            host: process.env.MAIN_REDIS_HOST!,
+            port: Number(process.env.MAIN_REDIS_PORT) || 6379
+        },
         hierarchy: {
             host: process.env.HIERARCHY_REDIS_HOST!,
             port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379

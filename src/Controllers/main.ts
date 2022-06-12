@@ -23,6 +23,7 @@ import { TooManyUserRequestError } from '../Errors/UserError'
 import { Request } from 'express'
 import { ViewerAPI } from '../API/ViewerAPI'
 import { ContentService } from '../Services/ContentService'
+import { ViewLogService } from '../Services/ViewLogService'
 
 @JsonController('')
 export class MainController {
@@ -85,6 +86,8 @@ export class MainController {
     async getContent (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
         try {
             const contentService = new ContentService(new ViewerAPI(req))
+            const viewLogService = new ViewLogService()
+            viewLogService.savePageViewLog(req, user, id)
             const dto = await contentService.getContent(user, id)
             return makeResponseMessage(200, dto)
         } catch (err) {
