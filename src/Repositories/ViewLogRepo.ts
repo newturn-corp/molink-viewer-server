@@ -10,8 +10,7 @@ class ViewLogRepo {
                 pageID,
                 userAgent,
                 ip,
-                createdAt: new Date(),
-                updatedAt: new Date()
+                createdAt: new Date()
             })
     }
 }
