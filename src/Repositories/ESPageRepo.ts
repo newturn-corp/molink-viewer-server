@@ -4,7 +4,7 @@ import {
     ESUser,
     PageVisibility,
     ESPageSummaryWithVisibility,
-    ESPageMetaInfo
+    ESPageMetaInfo, ESEditorPageInfo
 } from '@newturn-develop/types-molink'
 
 const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt']
@@ -20,6 +20,10 @@ class ESUserRepo {
 
     rawSourceToPageMetaInfo (id: string, source: any) {
         return new ESPageMetaInfo(source.title, source.userId, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility)
+    }
+
+    rawSourceToEditorPageInfo (id: string, source: any) {
+        return new ESEditorPageInfo(source.lastEditedAt, source.lastPublishedAt, source.like, source.tags)
     }
 
     getVisibilityToNumber (visibility: PageVisibility) {
@@ -125,6 +129,13 @@ class ESUserRepo {
             includeFields: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'lastPublishedAt', 'tags', 'visibility']
         })
         return source && this.rawSourceToPageMetaInfo(pageID, source)
+    }
+
+    async getEditorPageInfo (pageID: string): Promise<ESPageMetaInfo> {
+        const source = await OpenSearch.get('molink-page', pageID, {
+            includeFields: ['lastEditedAt', 'lastPublishedAt', 'tags', 'like']
+        })
+        return source && this.rawSourceToEditorPageInfo(pageID, source)
     }
 
     async getPopularPageList (size: number = 5, from: number = 0) {

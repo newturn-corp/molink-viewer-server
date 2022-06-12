@@ -36,6 +36,18 @@ export class PageService {
         return pageMetaInfo
     }
 
+    async getEditorPageInfo (user: User, pageId: string) {
+        const authority = await this.viewerAPI.getPageAuthority(pageId)
+        if (!authority.viewable) {
+            throw new UnauthorizedForPage()
+        }
+        const editorPageInfo = await ESPageRepo.getEditorPageInfo(pageId)
+        if (!editorPageInfo) {
+            throw new PageNotExists()
+        }
+        return editorPageInfo
+    }
+
     async getUserLikePage (user: User, pageId: string) {
         const isLike = await LikeRepo.checkActiveLikeExists(pageId, user.id)
         return new GetUserLikePageResponseDTO(isLike)

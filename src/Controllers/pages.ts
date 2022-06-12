@@ -49,6 +49,23 @@ export class PageController {
         }
     }
 
+    @Get('/:id/editor-page-info')
+    async getEditorPageInfo (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
+        try {
+            const service = new PageService(new ViewerAPI(req))
+            const dto = await service.getEditorPageInfo(user, id)
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof PageNotExists) {
+                throw new CustomHttpError(404, 1, '페이지가 존재하지 않습니다.')
+            } else if (err instanceof UnauthorizedForPage) {
+                throw new CustomHttpError(403, 1, '권한이 없습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
     @Get('/:id/like')
     @Authorized()
     async getUserPageLike (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
