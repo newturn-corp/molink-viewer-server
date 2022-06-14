@@ -202,9 +202,22 @@ class ESUserRepo {
     async searchByText (text: string, from: number, size: number) {
         const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             query: {
-                multi_match: {
-                    query: text,
-                    fields: ['title^4', 'tags.keyword^4', 'content']
+                bool: {
+                    must: [
+                        {
+                            term: {
+                                visibility: {
+                                    value: 2
+                                }
+                            }
+                        },
+                        {
+                            multi_match: {
+                                query: text,
+                                fields: ['title^4', 'tags.keyword^4', 'content']
+                            }
+                        }
+                    ]
                 }
             },
             highlight: {
