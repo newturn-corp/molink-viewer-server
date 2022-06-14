@@ -1,4 +1,4 @@
-import { JsonController, Get, Param, QueryParam } from 'routing-controllers'
+import { JsonController, Get, QueryParam } from 'routing-controllers'
 import {
     makeResponseMessage
 } from '@newturn-develop/types-molink'
@@ -13,8 +13,8 @@ export class SearchController {
     async searchPages (@QueryParam('q') q: string, @QueryParam('from') from: string, @QueryParam('size') size: string) {
         try {
             const service = new SearchService()
-            const arr = await service.searchPage(q, Number(from), Number(size))
-            return makeResponseMessage(200, arr)
+            const dto = await service.searchPage(q, Number(from), Number(size))
+            return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof TooManyPageRequestError) {
                 throw new CustomHttpError(409, 0, '너무 많은 페이지를 요청했습니다.')

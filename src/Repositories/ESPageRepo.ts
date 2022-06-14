@@ -200,7 +200,7 @@ class ESUserRepo {
     }
 
     async searchByText (text: string, from: number, size: number) {
-        const documents = await OpenSearch.select('molink-page', {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             query: {
                 multi_match: {
                     query: text,
@@ -217,10 +217,13 @@ class ESUserRepo {
             size,
             _source: ['title', 'image', 'lastEditedAt', 'userId', 'tags', 'lastPublishedAt', 'description']
         })
-        return documents.map((raw: any) => {
-            const { _id: id, _source: source, highlight } = raw
-            return this.rawSourceToPageSearchResult(id, source, highlight)
-        })
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source, highlight } = raw
+                return this.rawSourceToPageSearchResult(id, source, highlight)
+            })
+        }
     }
 }
 export default new ESUserRepo()
