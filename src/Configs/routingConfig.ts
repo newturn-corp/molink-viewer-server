@@ -5,6 +5,7 @@ import { AuthMiddleware } from '../Middlewares/AuthMiddleware'
 import { CustomErrorHandler } from '../Middlewares/CustomErrorHandler'
 import PageController from '../Controllers/pages'
 import PageListController from '../Controllers/pageList'
+import { SearchController } from '../Controllers/search'
 
 const routingControllersOptions: RoutingControllersOptions = {
     defaultErrorHandler: false,
@@ -12,7 +13,8 @@ const routingControllersOptions: RoutingControllersOptions = {
     controllers: [
         MainController,
         PageController,
-        PageListController
+        PageListController,
+        SearchController
     ],
     authorizationChecker: AuthMiddleware.authorization,
     currentUserChecker: AuthMiddleware.currentUser
