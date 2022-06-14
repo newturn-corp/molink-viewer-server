@@ -6,25 +6,29 @@ class ESUserRepo {
         return new ESUser(id, source.biography, source.nickname, source.profileImageUrl)
     }
 
-    async searchUsers (nickname: string, from = 0): Promise<ESUser[]> {
-        const rawDocuments = await OpenSearch.select('molink-user', {
+    async searchUsers (nickname: string, from: number, size: number) {
+        const {
+            total,
+            documents: rawDocuments
+        } = await OpenSearch.selectWithTotal('molink-user', {
             query: {
-                bool: {
-                    must: [{
-                        match: {
-                            nickname: {
-                                query: nickname,
-                                fuzziness: 'AUTO'
-                            }
-                        }
-                    }]
+                match: {
+                    nickname: {
+                        query: nickname,
+                        fuzziness: 'AUTO'
+                    }
                 }
-            }
+            },
+            from,
+            size
         })
-        return rawDocuments.map((raw: any) => {
-            const { _id: id, _source: source } = raw
-            return this.rawSourceToUser(id, source)
-        }) as ESUser[]
+        return {
+            total,
+            documents: rawDocuments.map((raw: any) => {
+                const { _id: id, _source: source } = raw
+                return this.rawSourceToUser(id, source)
+            }) as ESUser[]
+        }
     }
 
     async getUserInfoListByIdList (idList: number[]) {
