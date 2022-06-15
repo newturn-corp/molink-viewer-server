@@ -27,8 +27,8 @@ class ESUserRepo {
     }
 
     rawSourceToPageSearchResult (id: string, source: any, highlight: any) {
-        const title = highlight.title ? highlight.title[0] : source.title
-        const content = highlight.content ? highlight.content[0] : source.description
+        const title = highlight?.title ? highlight.title[0] : source.title
+        const content = highlight?.content ? highlight.content[0] : source.description
         return new ESPageSearchResult(id, title, source.userId, source.image, content, source.tags, source.lastEditedAt, source.lastPublishedAt)
     }
 
