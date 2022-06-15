@@ -4,7 +4,7 @@ import {
     ESUser,
     PageVisibility,
     ESPageSummaryWithVisibility,
-    ESPageMetaInfo, ESEditorPageInfo
+    ESPageMetaInfo, ESEditorPageInfo, ESPageSearchResult
 } from '@newturn-develop/types-molink'
 
 const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt']
@@ -24,6 +24,12 @@ class ESUserRepo {
 
     rawSourceToEditorPageInfo (id: string, source: any) {
         return new ESEditorPageInfo(source.lastEditedAt, source.lastPublishedAt, source.like, source.tags)
+    }
+
+    rawSourceToPageSearchResult (id: string, source: any, highlight: any) {
+        const title = highlight?.title ? highlight.title[0] : source.title
+        const content = highlight?.content ? highlight.content[0] : source.description
+        return new ESPageSearchResult(id, title, source.userId, source.image, content, source.tags, source.lastEditedAt, source.lastPublishedAt)
     }
 
     getVisibilityToNumber (visibility: PageVisibility) {
@@ -191,6 +197,46 @@ class ESUserRepo {
             includeFields: ['rawContent']
         })
         return source && source.rawContent
+    }
+
+    async searchByText (text: string, from: number, size: number) {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
+            query: {
+                bool: {
+                    must: [
+                        {
+                            term: {
+                                visibility: {
+                                    value: 2
+                                }
+                            }
+                        },
+                        {
+                            multi_match: {
+                                query: text,
+                                fields: ['title^4', 'tags.keyword^4', 'content']
+                            }
+                        }
+                    ]
+                }
+            },
+            highlight: {
+                fields: {
+                    content: {},
+                    title: {}
+                }
+            },
+            from,
+            size,
+            _source: ['title', 'image', 'lastEditedAt', 'userId', 'tags', 'lastPublishedAt', 'description']
+        })
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source, highlight } = raw
+                return this.rawSourceToPageSearchResult(id, source, highlight)
+            })
+        }
     }
 }
 export default new ESUserRepo()
