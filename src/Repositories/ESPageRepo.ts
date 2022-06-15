@@ -222,7 +222,9 @@ class ESUserRepo {
             },
             highlight: {
                 fields: {
-                    content: {},
+                    content: {
+                        fragment_size: 200
+                    },
                     title: {}
                 }
             },
