@@ -6,6 +6,8 @@ import { CustomErrorHandler } from '../Middlewares/CustomErrorHandler'
 import PageController from '../Controllers/pages'
 import PageListController from '../Controllers/pageList'
 import { SearchController } from '../Controllers/search'
+import BlogController from '../Controllers/blog'
+import { UserController } from '../Controllers/users'
 
 const routingControllersOptions: RoutingControllersOptions = {
     defaultErrorHandler: false,
@@ -14,7 +16,9 @@ const routingControllersOptions: RoutingControllersOptions = {
         MainController,
         PageController,
         PageListController,
-        SearchController
+        SearchController,
+        BlogController,
+        UserController
     ],
     authorizationChecker: AuthMiddleware.authorization,
     currentUserChecker: AuthMiddleware.currentUser

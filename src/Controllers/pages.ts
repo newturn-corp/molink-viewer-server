@@ -10,13 +10,11 @@ import { PageNotExists, TooManyPageRequestError, UnauthorizedForPage } from '../
 import { CommentService } from '../Services/CommentService'
 import { ViewerAPI } from '../API/ViewerAPI'
 import { Request } from 'express'
-import BlogService from '../Services/BlogService'
-import { TooManyUserRequestError } from '../Errors/UserError'
 
 @JsonController('/pages')
 export class PageController {
     @Get('/:id/summary')
-    async getAuthority (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
+    async getPageSummary (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
         try {
             const service = new PageService(new ViewerAPI(req))
             const dto = await service.getPageSummary(user, id)

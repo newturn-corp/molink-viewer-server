@@ -4,7 +4,7 @@ import {
     DocumentVisibility, ESPageSummary, ESPageSummaryWithVisibility,
     GetDocumentAuthorityDTO,
     HierarchyDocumentInfoInterface, PageVisibility,
-    User
+    User, GetBlogAuthorityResponseDTO, BlogAuthority
 } from '@newturn-develop/types-molink'
 import HierarchyRepo from '../Repositories/HierarchyRepo'
 import { PageNotExist, DocumentUserNotExists, HierarchyNotExists } from '../Errors/DocumentError'
@@ -14,6 +14,10 @@ import CacheService from './CacheService'
 import { Slack } from '@newturn-develop/molink-utils'
 import env from '../env'
 import { UserNotExists } from '../Errors/Common'
+import BlogFollowRepo from '../Repositories/BlogFollowRepo'
+import { BlogNotExists } from '../Errors/BlogError'
+import BlogRepo from '../Repositories/BlogRepo'
+import BlogUserRepo from '../Repositories/BlogUserRepo'
 
 class AuthorityService {
     checkPageViewable (viewer: User, hierarchyDocumentInfo: HierarchyDocumentInfoInterface, isFollower: boolean) {
@@ -86,6 +90,10 @@ class AuthorityService {
         return followers.map(follower => follower.id).includes(viewerId)
     }
 
+    checkUserFollowBlog (blogID: number, userID: number) {
+        return BlogFollowRepo.checkUserFollowBlog(blogID, userID)
+    }
+
     async getPageHierarchyInfo (pageId: string): Promise<HierarchyDocumentInfoInterface> {
         try {
             const rawPage = await CacheService.hierarchy.get(`page-${pageId}`)
@@ -133,6 +141,18 @@ class AuthorityService {
             return new GetDocumentAuthorityDTO(null, null, null, viewable, editable)
         }
         return new GetDocumentAuthorityDTO(pageUserId, pageUser.nickname, hierarchyPageInfo.title, viewable, editable)
+    }
+
+    async getBlogAuthority (viewer: User, blogID: number) {
+        const blog = await BlogRepo.getBlog(blogID)
+        if (!blog) {
+            throw new BlogNotExists()
+        }
+        const blogUser = viewer && await BlogUserRepo.getBlogUser(blogID, viewer.id)
+        if (blogUser) {
+            return new BlogAuthority(true, true, !!blogUser.authority_set_profile, !!blogUser.authority_handle_follow)
+        }
+        return new BlogAuthority(!!blog.is_private, false, false, false)
     }
 }
 export default new AuthorityService()

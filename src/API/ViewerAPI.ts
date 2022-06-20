@@ -1,6 +1,6 @@
 import axios from 'axios'
 import env from '../env'
-import { GetDocumentAuthorityDTO } from '@newturn-develop/types-molink'
+import { GetBlogAuthorityResponseDTO, GetDocumentAuthorityDTO } from '@newturn-develop/types-molink'
 
 export class ViewerAPI {
     clientRequest: any
@@ -18,6 +18,18 @@ export class ViewerAPI {
             }
             : undefined
         const res = await axios.get(`${env.api.url}/viewer/pages/${pageId}/authority`, config)
+        return res.data.data
+    }
+
+    async getBlogAuthority (blogID: number): Promise<GetBlogAuthorityResponseDTO> {
+        const config = this.clientRequest.cookies.token
+            ? {
+                headers: {
+                    Cookie: `token=${this.clientRequest.cookies.token}`
+                }
+            }
+            : undefined
+        const res = await axios.get(`${env.api.url}/viewer/blog/${blogID}/authority`, config)
         return res.data.data
     }
 }
