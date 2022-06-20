@@ -7,7 +7,7 @@ import {
     ESPageMetaInfo, ESEditorPageInfo, ESPageSearchResult
 } from '@newturn-develop/types-molink'
 
-const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt']
+const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt', 'blogID']
 
 class ESUserRepo {
     rawSourceToPageSummary (id: string, source: any) {
@@ -161,7 +161,7 @@ class ESUserRepo {
                     }
                 }
             ],
-            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt'],
+            _source: summaryFields,
             from,
             size,
             query: {
@@ -230,7 +230,7 @@ class ESUserRepo {
             },
             from,
             size,
-            _source: ['title', 'image', 'lastEditedAt', 'userId', 'tags', 'lastPublishedAt', 'description']
+            _source: ['title', 'image', 'lastEditedAt', 'userId', 'tags', 'lastPublishedAt', 'description', 'blogID']
         })
         return {
             total,
