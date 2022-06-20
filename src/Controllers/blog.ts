@@ -29,36 +29,6 @@ export class BlogController {
         }
     }
 
-    @Get('/:id')
-    async getBlog (@CurrentUser() user: User, @Param('id') blogIDString: string, @Req() req: Request) {
-        try {
-            const service = new BlogService(new ViewerAPI(req))
-            const data = await service.getBlog(user, Number(blogIDString))
-            return makeResponseMessage(200, data)
-        } catch (err) {
-            if (err instanceof BlogNotExists) {
-                throw new CustomHttpError(404, 1, '블로그가 존재하지 않습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/:id/name')
-    async getBlogName (@CurrentUser() user: User, @Param('id') blogIDString: string, @Req() req: Request) {
-        try {
-            const service = new BlogService(new ViewerAPI(req))
-            const dto = await service.getBlogName(Number(blogIDString))
-            return makeResponseMessage(200, dto)
-        } catch (err) {
-            if (err instanceof BlogNotExists) {
-                throw new CustomHttpError(404, 1, '블로그가 존재하지 않습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
     @Get('/info-map-by-id')
     async getBlogInfoMapByIDList (@CurrentUser() user: User, @QueryParam('blogIDList') blogIDList: string, @Req() req: Request) {
         try {
@@ -83,6 +53,36 @@ export class BlogController {
         } catch (err) {
             if (err instanceof TooManyUserRequestError) {
                 throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/:id')
+    async getBlog (@CurrentUser() user: User, @Param('id') blogIDString: string, @Req() req: Request) {
+        try {
+            const service = new BlogService(new ViewerAPI(req))
+            const data = await service.getBlog(user, Number(blogIDString))
+            return makeResponseMessage(200, data)
+        } catch (err) {
+            if (err instanceof BlogNotExists) {
+                throw new CustomHttpError(404, 1, '블로그가 존재하지 않습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/:id/name')
+    async getBlogName (@CurrentUser() user: User, @Param('id') blogIDString: string, @Req() req: Request) {
+        try {
+            const service = new BlogService(new ViewerAPI(req))
+            const dto = await service.getBlogName(Number(blogIDString))
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof BlogNotExists) {
+                throw new CustomHttpError(404, 1, '블로그가 존재하지 않습니다.')
             } else {
                 throw err
             }
