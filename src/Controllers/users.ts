@@ -9,7 +9,7 @@ import UserService from '../Services/UserService'
 import { UserNotExists } from '../Errors/Common'
 import { TooManyUserRequestError } from '../Errors/UserError'
 
-@JsonController('users')
+@JsonController('/users')
 export class UserController {
     @Get('/health-check')
     async checkServerStatus () {
