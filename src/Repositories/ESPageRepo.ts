@@ -11,11 +11,11 @@ const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt'
 
 class ESUserRepo {
     rawSourceToPageSummary (id: string, source: any) {
-        return new ESPageSummary(id, source.title, source.blogID, source.image, source.description, source.lastEditedAt, source.like, source.commentCount, source.lastPublishedAt)
+        return new ESPageSummary(id, source.title, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.like, source.commentCount)
     }
 
     rawSourceToPageSummaryWithVisibility (id: string, source: any) {
-        return new ESPageSummaryWithVisibility(id, source.title, source.blogID, source.image, source.description, source.lastEditedAt, source.like, source.commentCount, source.lastPublishedAt, source.visibility)
+        return new ESPageSummaryWithVisibility(id, source.title, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.like, source.commentCount, source.visibility)
     }
 
     rawSourceToPageMetaInfo (id: string, source: any) {
