@@ -40,19 +40,19 @@ export class PageListController {
         }
     }
 
-    // @Get('/:userId')
-    // async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string, @QueryParam('count') count: string) {
-    //     try {
-    //         const dto = await PageListService.getUserPageList(user, Number(userId), new GetPageListDTO(Number(from), Number(count)))
-    //         return makeResponseMessage(200, dto)
-    //     } catch (err) {
-    //         if (err instanceof TooManyUserRequestError) {
-    //             throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
-    //         } else {
-    //             throw err
-    //         }
-    //     }
-    // }
+    @Get('/users/:userId')
+    async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string, @QueryParam('count') count: string) {
+        try {
+            const dto = await PageListService.getUserPageList(user, Number(userId), new GetPageListDTO(Number(from), Number(count)))
+            return makeResponseMessage(200, dto)
+        } catch (err) {
+            if (err instanceof TooManyUserRequestError) {
+                throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
 }
 
 export default PageListController

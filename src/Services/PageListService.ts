@@ -52,5 +52,13 @@ class PageListService {
         const { total, documents } = await ESPageRepo.getPopularPageList(dto.count, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
+
+    async getUserPageList (user: User, userId: number, dto: GetPageListDTO) {
+        if (dto.count > 20) {
+            throw new TooManyPageRequestError()
+        }
+        const { total, documents } = await ESPageRepo.getUserPageSummaryList(userId, dto.count, dto.from)
+        return new GetPageListResponseDTO(total, documents)
+    }
 }
 export default new PageListService()

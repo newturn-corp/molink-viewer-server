@@ -192,6 +192,44 @@ class ESUserRepo {
         }
     }
 
+    async getUserPageSummaryList (userId: number, size: number = 5, from: number = 0) {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
+            sort: [
+                {
+                    lastEditedAt: {
+                        order: 'desc'
+                    }
+                }
+            ],
+            _source: summaryFields,
+            from,
+            size,
+            query: {
+                bool: {
+                    must: [
+                        {
+                            term: {
+                                userId
+                            }
+                        },
+                        {
+                            term: {
+                                visibility: 2
+                            }
+                        }
+                    ]
+                }
+            }
+        })
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source } = raw
+                return this.rawSourceToPageSummary(id, source)
+            }) as ESPageSummary[]
+        }
+    }
+
     async getPageRawContent (pageID: string) {
         const source = await OpenSearch.get('molink-page', pageID, {
             includeFields: ['rawContent']
