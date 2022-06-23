@@ -58,10 +58,10 @@ export class UserController {
         }
     }
 
-    @Get('/:userId/follow-info')
-    async getFollowInfo (@CurrentUser() user: User, @Param('userId') userId: string) {
-        const dto = await UserService.getFollowInfo(user, Number(userId))
-        return makeResponseMessage(200, dto)
+    @Get('/:userId/follow-blogs')
+    async getUserFollowBlogs (@CurrentUser() user: User, @Param('userId') userId: string) {
+        const arr = await UserService.getUserFollowBlogs(user, Number(userId))
+        return makeResponseMessage(200, arr)
     }
 
     @Get('/:userId/follow-status')
@@ -69,5 +69,11 @@ export class UserController {
     async getFollowStatus (@CurrentUser() user: User, @Param('userId') userId: string) {
         const dto = await UserService.getFollowStatus(user, Number(userId))
         return makeResponseMessage(200, dto)
+    }
+
+    @Get('/:userID/blogs')
+    async getUserBlogs (@CurrentUser() user: User, @Param('userID') userIDString: string) {
+        const arr = await UserService.getUserBlogs(user, Number(userIDString))
+        return makeResponseMessage(200, arr)
     }
 }

@@ -16,6 +16,16 @@ class BlogRepo extends BaseRepo {
         const queryString = 'SELECT * FROM BLOG_TB WHERE blog_name IN (?)'
         return this._selectPlural(queryString, [nameList])
     }
+
+    getBlogsByUserID (userID: number): Promise<Blog[]> {
+        const queryString = 'SELECT * FROM (SELECT blog_id FROM BLOG_USER_TB WHERE user_id = ?) A, BLOG_TB WHERE BLOG_TB.id = A.blog_id'
+        return this._selectPlural(queryString, [userID])
+    }
+
+    getPublicBlogsByUserID (userID: number): Promise<Blog[]> {
+        const queryString = 'SELECT * FROM (SELECT blog_id FROM BLOG_USER_TB WHERE user_id = ?) A, (SELECT * FROM BLOG_TB WHERE is_private = 0) B WHERE B.id = A.blog_id'
+        return this._selectPlural(queryString, [userID])
+    }
 }
 
 export default new BlogRepo()
