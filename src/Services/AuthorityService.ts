@@ -2,15 +2,12 @@ import ContentRepo from '../Repositories/ContentRepo'
 import FollowerRepo from '../Repositories/FollowRepo'
 import {
     BlogAuthority,
-    GetDocumentAuthorityDTO,
     HierarchyDocumentInfoInterface,
     PageAuthority,
     PageVisibility,
     User
 } from '@newturn-develop/types-molink'
-import HierarchyRepo from '../Repositories/HierarchyRepo'
-import { DocumentUserNotExists, PageNotExist } from '../Errors/DocumentError'
-import UserRepo from '../Repositories/UserRepo'
+import { PageNotExist } from '../Errors/DocumentError'
 import CacheService from './CacheService'
 import { Slack } from '@newturn-develop/molink-utils'
 import env from '../env'
@@ -18,13 +15,9 @@ import BlogFollowRepo from '../Repositories/BlogFollowRepo'
 import { BlogNotExists } from '../Errors/BlogError'
 import BlogRepo from '../Repositories/BlogRepo'
 import BlogUserRepo from '../Repositories/BlogUserRepo'
+import LiveBlogRepo from '../Repositories/LiveBlogRepo'
 
 class AuthorityService {
-    async checkIsFollower (targetId: number, viewerId: number) {
-        const followers = await FollowerRepo.getUserFollowers(targetId)
-        return followers.map(follower => follower.id).includes(viewerId)
-    }
-
     checkUserFollowBlog (blogID: number, userID: number) {
         return BlogFollowRepo.checkUserFollowBlog(blogID, userID)
     }
@@ -43,13 +36,9 @@ class AuthorityService {
             throw new PageNotExist()
         }
         const info = content.getMap('info')
-        const pageUserId = info.get('userId') as number
-        const pageUser = await UserRepo.getActiveUserById(pageUserId)
-        if (!pageUser) {
-            throw new DocumentUserNotExists()
-        }
+        const pageBlogID = info.get('blogID') as number
 
-        const hierarchyPageInfo = await HierarchyRepo.getHierarchyPageInfo(pageUserId, pageId)
+        const hierarchyPageInfo = await LiveBlogRepo.getBlogPageInfo(pageBlogID, pageId)
         if (!hierarchyPageInfo) {
             throw new PageNotExist()
         }
