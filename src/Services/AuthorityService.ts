@@ -95,7 +95,7 @@ class AuthorityService {
         if (blogUser) {
             return new BlogAuthority(true, true, !!blogUser.authority_set_profile, !!blogUser.authority_handle_follow)
         }
-        return new BlogAuthority(!!blog.is_private, false, false, false)
+        return new BlogAuthority(!blog.is_private, false, false, false)
     }
 }
 export default new AuthorityService()
