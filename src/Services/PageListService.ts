@@ -1,11 +1,4 @@
-import {
-    GetFollowPageListDTO, GetPageListDTO,
-    GetPageListResponseDTO,
-    GetUserPageListDTO,
-    GetUserPageListResponseDTO,
-    PageVisibility,
-    User
-} from '@newturn-develop/types-molink'
+import { GetPageListDTO, GetPageListResponseDTO, PageVisibility, User } from '@newturn-develop/types-molink'
 import AuthorityService from './AuthorityService'
 import ESPageRepo from '../Repositories/ESPageRepo'
 import FollowRepo from '../Repositories/FollowRepo'
@@ -57,7 +50,8 @@ class PageListService {
         if (dto.count > 20) {
             throw new TooManyPageRequestError()
         }
-        const { total, documents } = await ESPageRepo.getUserPageSummaryList(userId, dto.count, dto.from)
+        const maxVisibility = user.id === userId ? PageVisibility.Private : PageVisibility.Public
+        const { total, documents } = await ESPageRepo.getUserPageSummaryList(userId, maxVisibility, dto.count, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
 }

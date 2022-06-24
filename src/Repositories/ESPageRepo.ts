@@ -192,7 +192,7 @@ class ESUserRepo {
         }
     }
 
-    async getUserPageSummaryList (userId: number, size: number = 5, from: number = 0) {
+    async getUserPageSummaryList (userId: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
         const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             sort: [
                 {
@@ -213,8 +213,10 @@ class ESUserRepo {
                             }
                         },
                         {
-                            term: {
-                                visibility: 2
+                            range: {
+                                visibility: {
+                                    gte: maxVisibility
+                                }
                             }
                         }
                     ]
