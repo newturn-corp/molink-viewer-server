@@ -12,6 +12,9 @@ import { TooManyUserRequestError } from '../Errors/UserError'
 import FollowRepo from '../Repositories/FollowRepo'
 import User from '../Domains/User'
 import FollowRequestRepo from '../Repositories/FollowRequestRepo'
+import BlogRepo from '../Repositories/BlogRepo'
+import ESBlogRepo from '../Repositories/ESBlogRepo'
+import BlogFollowRepo from '../Repositories/BlogFollowRepo'
 
 class UserService {
     async getUserIDByNickname (nickname: string) {
@@ -46,10 +49,10 @@ class UserService {
         return new GetUserInfoByUserMapResponseDTO(infoMap)
     }
 
-    async getFollowInfo (user: User, targetUserId: number) {
-        const { count: followerCount } = await FollowRepo.getUserFollowerCount(targetUserId)
-        const { count: followCount } = await FollowRepo.getUserFollowCount(targetUserId)
-        return new GetFollowInfoResponseDTO(followerCount, followCount)
+    async getUserFollowBlogs (user: User, targetUserId: number) {
+        const follows = await BlogFollowRepo.getUserBlogFollows(targetUserId)
+        const blogs = await ESBlogRepo.getBlogs(follows.map(follow => follow.user_id))
+        return blogs
     }
 
     async getFollowStatus (user: User, targetUserId: number) {
@@ -66,6 +69,11 @@ class UserService {
             return new GetFollowStatusResponseDTO(FollowStatus.Followed)
         }
         return new GetFollowStatusResponseDTO(FollowStatus.Default)
+    }
+
+    async getUserBlogs (user: User, userID: number) {
+        const blogs = (user && user.id === userID) ? await BlogRepo.getBlogsByUserID(userID) : await BlogRepo.getPublicBlogsByUserID(userID)
+        return ESBlogRepo.getBlogs(blogs.map(blog => blog.id))
     }
 }
 export default new UserService()

@@ -7,7 +7,6 @@ import {
 } from '@newturn-develop/types-molink'
 import { CustomHttpError } from '../Errors/HttpError'
 import { TooManyPageRequestError } from '../Errors/PageError'
-import BlogService from '../Services/BlogService'
 import { TooManyUserRequestError } from '../Errors/UserError'
 import PageListService from '../Services/PageListService'
 
@@ -41,7 +40,7 @@ export class PageListController {
         }
     }
 
-    @Get('/:userId')
+    @Get('/users/:userId')
     async getUserPageList (@CurrentUser() user: User, @Param('userId') userId: string, @QueryParam('from') from: string, @QueryParam('count') count: string) {
         try {
             const dto = await PageListService.getUserPageList(user, Number(userId), new GetPageListDTO(Number(from), Number(count)))

@@ -7,19 +7,19 @@ import {
     ESPageMetaInfo, ESEditorPageInfo, ESPageSearchResult
 } from '@newturn-develop/types-molink'
 
-const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt']
+const summaryFields = ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt', 'blogID']
 
 class ESUserRepo {
     rawSourceToPageSummary (id: string, source: any) {
-        return new ESPageSummary(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.like, source.commentCount, source.lastPublishedAt)
+        return new ESPageSummary(id, source.title, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.like, source.commentCount)
     }
 
     rawSourceToPageSummaryWithVisibility (id: string, source: any) {
-        return new ESPageSummaryWithVisibility(id, source.title, source.userId, source.image, source.description, source.lastEditedAt, source.like, source.commentCount, source.lastPublishedAt, source.visibility)
+        return new ESPageSummaryWithVisibility(id, source.title, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.like, source.commentCount, source.visibility)
     }
 
     rawSourceToPageMetaInfo (id: string, source: any) {
-        return new ESPageMetaInfo(source.title, source.userId, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility)
+        return new ESPageMetaInfo(source.title, source.userId, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility)
     }
 
     rawSourceToEditorPageInfo (id: string, source: any) {
@@ -43,7 +43,7 @@ class ESUserRepo {
         }
     }
 
-    async getUserPageSummaryList (userId: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
+    async getBlogPageSummaryList (blogID: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
         const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             sort: [
                 {
@@ -60,7 +60,7 @@ class ESUserRepo {
                     must: [
                         {
                             term: {
-                                userId
+                                blogID
                             }
                         },
                         {
@@ -132,7 +132,7 @@ class ESUserRepo {
 
     async getPageMetaInfo (pageID: string): Promise<ESPageMetaInfo> {
         const source = await OpenSearch.get('molink-page', pageID, {
-            includeFields: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'lastPublishedAt', 'tags', 'visibility']
+            includeFields: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'lastPublishedAt', 'tags', 'visibility', 'blogID']
         })
         return source && this.rawSourceToPageMetaInfo(pageID, source)
     }
@@ -161,7 +161,7 @@ class ESUserRepo {
                     }
                 }
             ],
-            _source: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'like', 'commentCount', 'lastPublishedAt'],
+            _source: summaryFields,
             from,
             size,
             query: {
@@ -177,6 +177,46 @@ class ESUserRepo {
                         {
                             exists: {
                                 field: 'lastPublishedAt'
+                            }
+                        }
+                    ]
+                }
+            }
+        })
+        return {
+            total,
+            documents: documents.map((raw: any) => {
+                const { _id: id, _source: source } = raw
+                return this.rawSourceToPageSummary(id, source)
+            }) as ESPageSummary[]
+        }
+    }
+
+    async getUserPageSummaryList (userId: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
+        const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
+            sort: [
+                {
+                    lastEditedAt: {
+                        order: 'desc'
+                    }
+                }
+            ],
+            _source: summaryFields,
+            from,
+            size,
+            query: {
+                bool: {
+                    must: [
+                        {
+                            term: {
+                                userId
+                            }
+                        },
+                        {
+                            range: {
+                                visibility: {
+                                    gte: maxVisibility
+                                }
                             }
                         }
                     ]
@@ -230,7 +270,7 @@ class ESUserRepo {
             },
             from,
             size,
-            _source: ['title', 'image', 'lastEditedAt', 'userId', 'tags', 'lastPublishedAt', 'description']
+            _source: ['title', 'image', 'lastEditedAt', 'userId', 'tags', 'lastPublishedAt', 'description', 'blogID']
         })
         return {
             total,

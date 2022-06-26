@@ -1,22 +1,19 @@
-import { JsonController, Get, CurrentUser, Param, Req, Authorized, QueryParam } from 'routing-controllers'
+import { JsonController, Get, CurrentUser, Param, Req, Authorized } from 'routing-controllers'
 import {
-    GetPageListDTO, GetUserPageListDTO,
     makeResponseMessage,
     User
 } from '@newturn-develop/types-molink'
 import { CustomHttpError } from '../Errors/HttpError'
 import { PageService } from '../Services/PageService'
-import { PageNotExists, TooManyPageRequestError, UnauthorizedForPage } from '../Errors/PageError'
+import { PageNotExists, UnauthorizedForPage } from '../Errors/PageError'
 import { CommentService } from '../Services/CommentService'
 import { ViewerAPI } from '../API/ViewerAPI'
 import { Request } from 'express'
-import BlogService from '../Services/BlogService'
-import { TooManyUserRequestError } from '../Errors/UserError'
 
 @JsonController('/pages')
 export class PageController {
     @Get('/:id/summary')
-    async getAuthority (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
+    async getPageSummary (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
         try {
             const service = new PageService(new ViewerAPI(req))
             const dto = await service.getPageSummary(user, id)

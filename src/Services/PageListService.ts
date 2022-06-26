@@ -1,25 +1,20 @@
-import {
-    GetFollowPageListDTO, GetPageListDTO,
-    GetPageListResponseDTO,
-    GetUserPageListDTO,
-    GetUserPageListResponseDTO,
-    PageVisibility,
-    User
-} from '@newturn-develop/types-molink'
+import { GetPageListDTO, GetPageListResponseDTO, PageVisibility, User } from '@newturn-develop/types-molink'
 import AuthorityService from './AuthorityService'
 import ESPageRepo from '../Repositories/ESPageRepo'
 import FollowRepo from '../Repositories/FollowRepo'
 import { TooManyPageRequestError } from '../Errors/PageError'
+import BlogUserRepo from '../Repositories/BlogUserRepo'
 
 class PageListService {
-    async getMaxPageVisibility (targetId: number, viewer: User | null) {
+    async getMaxBlogPageVisibility (blogID: number, viewer: User | null) {
         if (!viewer) {
             return PageVisibility.Public
         }
-        if (viewer.id === targetId) {
+        const blogUser = await BlogUserRepo.getBlogUser(blogID, viewer.id)
+        if (blogUser) {
             return PageVisibility.Private
         }
-        const isFollower = await AuthorityService.checkIsFollower(targetId, viewer.id)
+        const isFollower = await AuthorityService.checkUserFollowBlog(blogID, viewer.id)
         if (isFollower) {
             return PageVisibility.OnlyFollower
         } else {
@@ -27,12 +22,12 @@ class PageListService {
         }
     }
 
-    async getUserPageList (user: User, userId: number, dto: GetPageListDTO) {
+    async getBlogPageList (user: User, blogID: number, dto: GetPageListDTO) {
         if (dto.count > 20) {
             throw new TooManyPageRequestError()
         }
-        const maxVisibility = await this.getMaxPageVisibility(userId, user)
-        const { total, documents } = await ESPageRepo.getUserPageSummaryList(userId, maxVisibility, dto.count, dto.from)
+        const maxVisibility = await this.getMaxBlogPageVisibility(blogID, user)
+        const { total, documents } = await ESPageRepo.getBlogPageSummaryList(blogID, maxVisibility, dto.count, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
 
@@ -48,6 +43,15 @@ class PageListService {
             throw new TooManyPageRequestError()
         }
         const { total, documents } = await ESPageRepo.getPopularPageList(dto.count, dto.from)
+        return new GetPageListResponseDTO(total, documents)
+    }
+
+    async getUserPageList (user: User, userId: number, dto: GetPageListDTO) {
+        if (dto.count > 20) {
+            throw new TooManyPageRequestError()
+        }
+        const maxVisibility = user.id === userId ? PageVisibility.Private : PageVisibility.Public
+        const { total, documents } = await ESPageRepo.getUserPageSummaryList(userId, maxVisibility, dto.count, dto.from)
         return new GetPageListResponseDTO(total, documents)
     }
 }

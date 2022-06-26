@@ -14,7 +14,6 @@ import {
     HierarchyUserNotExists
 } from '../Errors/DocumentError'
 import { CustomHttpError } from '../Errors/HttpError'
-import HierarchyService from '../Services/HierarchyService'
 import { ContentNotExists, ContentUserNotExists, UnauthorizedForContent } from '../Errors/ContentError'
 import AuthorityService from '../Services/AuthorityService'
 import UserService from '../Services/UserService'
@@ -30,20 +29,6 @@ export class MainController {
     @Get('/health-check')
     async checkServerStatus () {
         return makeEmptyResponseMessage(200)
-    }
-
-    @Get('/users/:nickname/id')
-    async getUserIDByNickname (@Param('nickname') nickname: string) {
-        try {
-            const dto = await UserService.getUserIDByNickname(nickname)
-            return makeResponseMessage(200, dto)
-        } catch (err) {
-            if (err instanceof UserNotExists) {
-                throw new CustomHttpError(404, 1, '문서가 존재하지 않습니다.')
-            } else {
-                throw err
-            }
-        }
     }
 
     @Get('/documents/:documentId/authority')
@@ -101,63 +86,6 @@ export class MainController {
                 throw err
             }
         }
-    }
-
-    @Get('/hierarchy/:userId')
-    async getHierarchyByNickname (@CurrentUser() user: User, @Param('userId') userIDStr: string) {
-        try {
-            const data = await HierarchyService.getHierarchy(user, Number(userIDStr))
-            return makeResponseMessage(200, data)
-        } catch (err) {
-            if (err instanceof HierarchyUserNotExists) {
-                throw new CustomHttpError(404, 1, '유저가 존재하지 않습니다.')
-            } else if (err instanceof DocumentHierarchyInfoNotMatching) {
-                throw new CustomHttpError(400, 1, '예상치 못한 에러가 발생했습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/users')
-    async getUserInfoByIDMap (@QueryParam('userIDList') userIDList: string) {
-        try {
-            const data = await UserService.getUserInfoByIdMap(userIDList.split(',').map(Number))
-            return makeResponseMessage(200, data)
-        } catch (err) {
-            if (err instanceof TooManyUserRequestError) {
-                throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/users/nickname-list')
-    async getUserInfoByNicknameMap (@QueryParam('userNicknameList') userNicknameList: string) {
-        try {
-            const data = await UserService.getUserInfoByNicknameList(userNicknameList.split(','))
-            return makeResponseMessage(200, data)
-        } catch (err) {
-            if (err instanceof TooManyUserRequestError) {
-                throw new CustomHttpError(409, 0, '요청이 너무 많습니다.')
-            } else {
-                throw err
-            }
-        }
-    }
-
-    @Get('/users/:userId/follow-info')
-    async getFollowInfo (@CurrentUser() user: User, @Param('userId') userId: string) {
-        const dto = await UserService.getFollowInfo(user, Number(userId))
-        return makeResponseMessage(200, dto)
-    }
-
-    @Get('/users/:userId/follow-status')
-    @Authorized()
-    async getFollowStatus (@CurrentUser() user: User, @Param('userId') userId: string) {
-        const dto = await UserService.getFollowStatus(user, Number(userId))
-        return makeResponseMessage(200, dto)
     }
 }
 
