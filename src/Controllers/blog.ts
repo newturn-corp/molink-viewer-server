@@ -12,17 +12,24 @@ import { TooManyUserRequestError } from '../Errors/UserError'
 import { Request } from 'express'
 import { ViewerAPI } from '../API/ViewerAPI'
 import PageListService from '../Services/PageListService'
+import { InvalidParam } from '../Errors/Common'
 
 @JsonController('/blog')
 export class BlogController {
     @Get('/:id/authority')
     async getBlogAuthority (@CurrentUser() user: User, @Param('id') blogIDString: string) {
         try {
-            const dto = await AuthorityService.getBlogAuthority(user, Number(blogIDString))
+            const blogID = Number(blogIDString)
+            if (isNaN(blogID)) {
+                throw new InvalidParam()
+            }
+            const dto = await AuthorityService.getBlogAuthority(user, blogID)
             return makeResponseMessage(200, dto)
         } catch (err) {
             if (err instanceof BlogNotExists) {
                 throw new CustomHttpError(404, 1, '블로그가 존재하지 않습니다.')
+            } else if (err instanceof InvalidParam) {
+                throw new CustomHttpError(409, 1, '인자가 존재하지 않습니다.')
             } else {
                 throw err
             }
