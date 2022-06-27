@@ -19,7 +19,7 @@ class ESUserRepo {
     }
 
     rawSourceToPageMetaInfo (id: string, source: any) {
-        return new ESPageMetaInfo(source.title, source.userId, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility)
+        return new ESPageMetaInfo(source.title, source.userId, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility, source.icon)
     }
 
     rawSourceToEditorPageInfo (id: string, source: any) {
