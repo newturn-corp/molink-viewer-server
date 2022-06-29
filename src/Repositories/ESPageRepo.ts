@@ -19,7 +19,7 @@ class ESUserRepo {
     }
 
     rawSourceToPageMetaInfo (id: string, source: any) {
-        return new ESPageMetaInfo(source.title, source.userId, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility)
+        return new ESPageMetaInfo(source.title, source.userId, source.blogID, source.image, source.description, source.lastEditedAt, source.lastPublishedAt, source.tags, source.visibility, source.icon)
     }
 
     rawSourceToEditorPageInfo (id: string, source: any) {
@@ -132,7 +132,7 @@ class ESUserRepo {
 
     async getPageMetaInfo (pageID: string): Promise<ESPageMetaInfo> {
         const source = await OpenSearch.get('molink-page', pageID, {
-            includeFields: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'lastPublishedAt', 'tags', 'visibility', 'blogID']
+            includeFields: ['title', 'userId', 'image', 'description', 'lastEditedAt', 'lastPublishedAt', 'tags', 'visibility', 'blogID', 'icon']
         })
         return source && this.rawSourceToPageMetaInfo(pageID, source)
     }
