@@ -24,7 +24,7 @@ class AuthorityService {
 
     async getPageInfo (pageId: string): Promise<HierarchyDocumentInfoInterface> {
         try {
-            const rawPage = await CacheService.hierarchy.get(`page-${pageId}`)
+            const rawPage = await CacheService.main.get(`page-${pageId}`)
             if (rawPage) {
                 return JSON.parse(rawPage)
             }
@@ -43,7 +43,7 @@ class AuthorityService {
             throw new PageNotExist()
         }
         try {
-            await CacheService.hierarchy.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 1800)
+            await CacheService.main.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 1800)
         } catch (err) {
             await Slack.sendTextMessage('Redis Error In Viewer Server', env.isProduction ? 'C02SE9VA8TC' : 'C02TWKQHJ64')
         }

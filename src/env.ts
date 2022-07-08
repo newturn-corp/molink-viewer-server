@@ -51,10 +51,6 @@ const env = {
         main: {
             host: process.env.MAIN_REDIS_HOST!,
             port: Number(process.env.MAIN_REDIS_PORT) || 6379
-        },
-        hierarchy: {
-            host: process.env.HIERARCHY_REDIS_HOST!,
-            port: Number(process.env.HIERARCHY_REDIS_PORT) || 6379
         }
     },
     allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
