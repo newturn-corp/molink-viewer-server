@@ -17,8 +17,6 @@ hooks:
       runas: ubuntu
     - location: infra/scripts/installNodePackages.sh
       runas: ubuntu
-    - location: infra/scripts/buildTsRuntime.sh
-      runas: ubuntu
     - location: infra/scripts/loadParametersFromAWSSSM.sh
       runas: ubuntu
   ApplicationStart:

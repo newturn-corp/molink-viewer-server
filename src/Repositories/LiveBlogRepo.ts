@@ -61,7 +61,7 @@ class LiveBlogRepo {
     }
 
     async getBlogPageInfo (blogID: number, pageId: string) {
-        const pageStrInRedis = await CacheService.hierarchy.get(`page-${pageId}`)
+        const pageStrInRedis = await CacheService.main.get(`page-${pageId}`)
         if (pageStrInRedis) {
             return JSON.parse(pageStrInRedis) as HierarchyDocumentInfoInterface
         }
@@ -70,7 +70,7 @@ class LiveBlogRepo {
             throw new HierarchyNotExists()
         }
         const hierarchyPageInfo = blog.getMap('pageInfoMap').get(pageId) as HierarchyDocumentInfoInterface
-        await CacheService.hierarchy.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 86400)
+        await CacheService.main.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 86400)
         return hierarchyPageInfo
     }
 }
