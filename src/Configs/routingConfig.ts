@@ -8,6 +8,7 @@ import PageListController from '../Controllers/pageList'
 import { SearchController } from '../Controllers/search'
 import BlogController from '../Controllers/blog'
 import { UserController } from '../Controllers/users'
+import FileController from '../Controllers/files'
 
 const routingControllersOptions: RoutingControllersOptions = {
     defaultErrorHandler: false,
@@ -18,7 +19,8 @@ const routingControllersOptions: RoutingControllersOptions = {
         PageListController,
         SearchController,
         BlogController,
-        UserController
+        UserController,
+        FileController
     ],
     authorizationChecker: AuthMiddleware.authorization,
     currentUserChecker: AuthMiddleware.currentUser
