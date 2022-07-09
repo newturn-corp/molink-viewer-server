@@ -53,6 +53,11 @@ const env = {
             port: Number(process.env.MAIN_REDIS_PORT) || 6379
         }
     },
+    file: {
+        security_secret: process.env.SECURITY_SECRET!,
+        encoded_policy: process.env.FILE_ENCODED_POLICY!,
+        signature: process.env.FILE_SIGNATURE!
+    },
     allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
 }
 
