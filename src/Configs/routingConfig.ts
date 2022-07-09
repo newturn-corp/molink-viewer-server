@@ -9,6 +9,7 @@ import { FileController } from '../Controllers/files'
 import { MainController } from '../Controllers/main'
 import { PageListController } from '../Controllers/pageList'
 import { SecurityController } from '../Controllers/security'
+import { TestFileController } from '../Controllers/file'
 
 const routingControllersOptions: RoutingControllersOptions = {
     defaultErrorHandler: false,
@@ -21,7 +22,8 @@ const routingControllersOptions: RoutingControllersOptions = {
         SearchController,
         BlogController,
         UserController,
-        SecurityController
+        SecurityController,
+        TestFileController
     ],
     authorizationChecker: AuthMiddleware.authorization,
     currentUserChecker: AuthMiddleware.currentUser
