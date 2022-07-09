@@ -14,13 +14,13 @@ const routingControllersOptions: RoutingControllersOptions = {
     defaultErrorHandler: false,
     middlewares: [CustomErrorHandler],
     controllers: [
+        FileController,
         MainController,
         PageController,
         PageListController,
         SearchController,
         BlogController,
-        UserController,
-        FileController
+        UserController
     ],
     authorizationChecker: AuthMiddleware.authorization,
     currentUserChecker: AuthMiddleware.currentUser
