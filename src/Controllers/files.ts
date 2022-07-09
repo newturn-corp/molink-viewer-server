@@ -14,46 +14,46 @@ import env from '../env'
 
 @JsonController('/files')
 export class FileController {
-    // @Get('/docx/:handle')
-    // async getDocx (@Param('handle') handle: string, @QueryParam('pageId') pageId: string, @CurrentUser() user: User, @Req() req: Request, @Res() res : Response) {
-    //     try {
-    //         const fileAuthorityService = new FileAuthorityService(new ViewerAPI(req))
-    //         const authority = await fileAuthorityService.checkFileAuthority(user, pageId, handle)
-    //         if (!authority) {
-    //             throw new UnauthorizedForContent()
-    //         }
-    //         const response = await axios.get(`https://cdn.filestackcontent.com/${handle}?policy=${env.file.encoded_policy}&signature=${env.file.signature}`, { responseType: 'stream' })
-    //         delete response.headers['access-control-allow-origin']
-    //         res.header(response.headers)
-    //         return response.data
-    //     } catch (err) {
-    //         if (err instanceof UnauthorizedForContent) {
-    //             throw new CustomHttpError(403, 0, '권한이 없습니다.')
-    //         } else {
-    //             throw err
-    //         }
-    //     }
-    // }
-    //
-    // @Get('/:handle')
-    // async getFile (@Param('handle') handle: string, @QueryParam('pageId') pageId: string, @CurrentUser() user: User, @Req() req: Request, @Res() res : Response) {
-    //     try {
-    //         const fileAuthorityService = new FileAuthorityService(new ViewerAPI(req))
-    //         const authority = await fileAuthorityService.checkFileAuthority(user, pageId, handle)
-    //         if (!authority) {
-    //             throw new UnauthorizedForContent()
-    //         }
-    //         const response = await axios.get(`https://cdn.filestackcontent.com/${handle}?policy=${env.file.encoded_policy}&signature=${env.file.signature}`, { responseType: 'stream' })
-    //         res.header(response.headers)
-    //         return response.data
-    //     } catch (err) {
-    //         if (err instanceof UnauthorizedForContent) {
-    //             throw new CustomHttpError(403, 0, '권한이 없습니다.')
-    //         } else {
-    //             throw err
-    //         }
-    //     }
-    // }
+    @Get('/docx/:handle')
+    async getDocx (@Param('handle') handle: string, @QueryParam('pageId') pageId: string, @CurrentUser() user: User, @Req() req: Request, @Res() res : Response) {
+        try {
+            const fileAuthorityService = new FileAuthorityService(new ViewerAPI(req))
+            const authority = await fileAuthorityService.checkFileAuthority(user, pageId, handle)
+            if (!authority) {
+                throw new UnauthorizedForContent()
+            }
+            const response = await axios.get(`https://cdn.filestackcontent.com/${handle}?policy=${env.file.encoded_policy}&signature=${env.file.signature}`, { responseType: 'stream' })
+            delete response.headers['access-control-allow-origin']
+            res.header(response.headers)
+            return response.data
+        } catch (err) {
+            if (err instanceof UnauthorizedForContent) {
+                throw new CustomHttpError(403, 0, '권한이 없습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
+
+    @Get('/:handle')
+    async getFile (@Param('handle') handle: string, @QueryParam('pageId') pageId: string, @CurrentUser() user: User, @Req() req: Request, @Res() res : Response) {
+        try {
+            const fileAuthorityService = new FileAuthorityService(new ViewerAPI(req))
+            const authority = await fileAuthorityService.checkFileAuthority(user, pageId, handle)
+            if (!authority) {
+                throw new UnauthorizedForContent()
+            }
+            const response = await axios.get(`https://cdn.filestackcontent.com/${handle}?policy=${env.file.encoded_policy}&signature=${env.file.signature}`, { responseType: 'stream' })
+            res.header(response.headers)
+            return response.data
+        } catch (err) {
+            if (err instanceof UnauthorizedForContent) {
+                throw new CustomHttpError(403, 0, '권한이 없습니다.')
+            } else {
+                throw err
+            }
+        }
+    }
 
     @Authorized()
     @Get('/security')
@@ -62,5 +62,3 @@ export class FileController {
         return makeResponseMessage(200, dto)
     }
 }
-
-export default FileController

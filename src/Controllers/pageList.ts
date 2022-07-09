@@ -54,5 +54,3 @@ export class PageListController {
         }
     }
 }
-
-export default PageListController
