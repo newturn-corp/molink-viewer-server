@@ -14,13 +14,6 @@ import env from '../env'
 
 @JsonController('/files')
 export class FileController {
-    @Authorized()
-    @Get('/security')
-    async issueFileUploadSecurity () {
-        const dto = await SecurityService.issueSecurity()
-        return makeResponseMessage(200, dto)
-    }
-
     @Get('/docx/:handle')
     async getDocx (@Param('handle') handle: string, @QueryParam('pageId') pageId: string, @CurrentUser() user: User, @Req() req: Request, @Res() res : Response) {
         try {
@@ -60,6 +53,13 @@ export class FileController {
                 throw err
             }
         }
+    }
+
+    @Authorized()
+    @Get('/security')
+    async issueFileUploadSecurity () {
+        const dto = await SecurityService.issueSecurity()
+        return makeResponseMessage(200, dto)
     }
 }
 
