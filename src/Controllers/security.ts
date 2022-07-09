@@ -12,17 +12,12 @@ import { FileAuthorityService } from '../Services/FileAuthorityService'
 import axios from 'axios'
 import env from '../env'
 
-@JsonController('/test')
-export class TestController {
+@JsonController('/security')
+export class SecurityController {
     @Authorized()
-    @Get('/security')
+    @Get('/file')
     async issueFileUploadSecurity () {
         const dto = await SecurityService.issueSecurity()
         return makeResponseMessage(200, dto)
-    }
-
-    @Get('/chicken')
-    async chicken () {
-        return makeResponseMessage(200, { text: 'hi' })
     }
 }
