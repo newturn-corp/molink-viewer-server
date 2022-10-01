@@ -12,6 +12,11 @@ export class PageService {
         this.viewerAPI = viewerAPI
     }
 
+    async getPageIDList () {
+        const pageIDList = await ESPageRepo.getPageIDList()
+        return pageIDList
+    }
+
     async getPageSummary (user: User, pageId: string) {
         const authority = await this.viewerAPI.getPageAuthority(pageId)
         if (!authority.viewable) {

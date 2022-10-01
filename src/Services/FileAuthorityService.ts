@@ -1,11 +1,11 @@
-import User from "../Domains/User";
-import {NoticePageVisibilityChangeDTO, PageVisibility} from "@newturn-develop/types-molink";
-import PageFileRelationshipRepo from "../Repositories/PageFileRelationshipRepo";
-import {ViewerAPI} from "../API/ViewerAPI";
+import User from '../Domains/User'
+import { NoticePageVisibilityChangeDTO, PageVisibility } from '@newturn-develop/types-molink'
+import PageFileRelationshipRepo from '../Repositories/PageFileRelationshipRepo'
+import { ViewerAPI } from '../API/ViewerAPI'
 
 export class FileAuthorityService {
     viewerAPI: ViewerAPI
-    constructor(viewerAPI: ViewerAPI) {
+    constructor (viewerAPI: ViewerAPI) {
         this.viewerAPI = viewerAPI
     }
 
