@@ -37,6 +37,9 @@ class AuthorityService {
         }
         const info = content.getMap('info')
         const pageBlogID = info.get('blogID') as number
+        if (!pageBlogID) {
+            throw new PageNotExist()
+        }
 
         const hierarchyPageInfo = await LiveBlogRepo.getBlogPageInfo(pageBlogID, pageId)
         if (!hierarchyPageInfo) {
