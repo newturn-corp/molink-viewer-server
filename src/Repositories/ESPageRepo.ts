@@ -48,7 +48,8 @@ class ESUserRepo {
             query: {
                 match_all: {}
             },
-            stored_fields: []
+            stored_fields: [],
+            size: 100000000
         })
         return documents.map((raw: any) => raw._id)
     }
