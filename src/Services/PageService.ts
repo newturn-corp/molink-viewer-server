@@ -32,7 +32,7 @@ export class PageService {
     async getPageMetaInfo (user: User, pageId: string) {
         const authority = await this.viewerAPI.getPageAuthority(pageId)
         if (!authority.viewable) {
-            throw new UnauthorizedForPage()
+            return {}
         }
         const pageMetaInfo = await ESPageRepo.getPageMetaInfo(pageId)
         if (!pageMetaInfo) {
