@@ -36,7 +36,7 @@ export class PageService {
         }
         const pageMetaInfo = await ESPageRepo.getPageMetaInfo(pageId)
         if (!pageMetaInfo) {
-            throw new PageNotExists()
+            return {}
         }
         return pageMetaInfo
     }
