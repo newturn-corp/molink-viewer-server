@@ -45,6 +45,9 @@ class AuthorityService {
         if (!hierarchyPageInfo) {
             throw new PageNotExist()
         }
+        if (!hierarchyPageInfo.blogID) {
+            throw new PageNotExist()
+        }
         try {
             await CacheService.main.setWithEx(`page-${pageId}`, JSON.stringify(hierarchyPageInfo), 1800)
         } catch (err) {
