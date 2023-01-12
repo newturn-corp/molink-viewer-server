@@ -49,8 +49,8 @@ const env = {
     },
     redis: {
         main: {
-            host: process.env.MAIN_REDIS_HOST!,
-            port: Number(process.env.MAIN_REDIS_PORT) || 6379
+            host: process.env.REDIS_HOST!,
+            port: Number(process.env.REDIS_PORT) || 6379
         }
     },
     file: {

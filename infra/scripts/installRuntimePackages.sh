@@ -4,8 +4,6 @@ apt-get -y update
 if [ $(dpkg-query -W -f='${Status}' build-essential 2>/dev/null | grep -c "ok installed") -eq 0 ]
 then
     echo "install build-essential"
-    apt-get install -y nvm
-    nvm install 17
     apt-get install -y build-essential
 else
     echo "build-essential is already installe. skip"
