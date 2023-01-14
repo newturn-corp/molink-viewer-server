@@ -211,4 +211,4 @@ export class AuthController {
     }
 }
 
-export default MainController
+export default AuthController
