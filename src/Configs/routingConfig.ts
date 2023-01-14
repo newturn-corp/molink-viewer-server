@@ -10,11 +10,13 @@ import { MainController } from '../Controllers/main'
 import { PageListController } from '../Controllers/pageList'
 import { SecurityController } from '../Controllers/security'
 import { TestFileController } from '../Controllers/file'
+import { AuthController } from '../Controllers/auth'
 
 const routingControllersOptions: RoutingControllersOptions = {
     defaultErrorHandler: false,
     middlewares: [CustomErrorHandler],
     controllers: [
+        AuthController,
         FileController,
         MainController,
         PageController,

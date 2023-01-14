@@ -16,7 +16,7 @@ class LiveBlogRepo {
     client: Knex<BlogUpdate>
 
     constructor () {
-        this.client = getKnexClient('pg', env.postgre.hierarchy.host, env.postgre.hierarchy.user, env.postgre.hierarchy.password, env.postgre.hierarchy.name)
+        this.client = getKnexClient('pg', env.postgre.hierarchy.host, env.postgre.hierarchy.user, env.postgre.hierarchy.password, env.postgre.hierarchy.name) as any
     }
 
     async getBlog (blogID: number) {

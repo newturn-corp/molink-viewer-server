@@ -45,7 +45,8 @@ const env = {
         region: process.env.OPENSEARCH_REGION!
     },
     api: {
-        url: process.env.API_SERVER_BASE_URL
+        url: process.env.API_SERVER_BASE_URL,
+        internalKey: process.env.INTERNAL_API_KEY
     },
     redis: {
         main: {
@@ -58,6 +59,7 @@ const env = {
         encoded_policy: process.env.FILE_ENCODED_POLICY!,
         signature: process.env.FILE_SIGNATURE!
     },
+    front_origin: process.env.FRONT_ORIGIN!,
     allow_origin_list: process.env.ALLOW_ORIGIN_LIST!
 }
 

@@ -26,6 +26,11 @@ class BlogRepo extends BaseRepo {
         const queryString = 'SELECT * FROM (SELECT blog_id FROM BLOG_USER_TB WHERE user_id = ?) A, (SELECT * FROM BLOG_TB WHERE is_private = 0) B WHERE B.id = A.blog_id'
         return this._selectPlural(queryString, [userID])
     }
+
+    getActiveBlogByBlogName (blogName: string): Promise<Blog | undefined> {
+        const queryString = 'SELECT * FROM BLOG_TB WHERE blog_name = ? AND is_deleted = 0'
+        return this._selectSingular(queryString, [blogName])
+    }
 }
 
 export default new BlogRepo()

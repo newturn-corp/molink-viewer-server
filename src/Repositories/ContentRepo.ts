@@ -13,7 +13,7 @@ class ContentRepo {
     client: Knex<ContentUpdate>
 
     constructor () {
-        this.client = getKnexClient('pg', env.postgre.content.host, env.postgre.content.user, env.postgre.content.password, env.postgre.content.name)
+        this.client = getKnexClient('pg', env.postgre.content.host, env.postgre.content.user, env.postgre.content.password, env.postgre.content.name) as any
     }
 
     async getContent (documentId: string) {
