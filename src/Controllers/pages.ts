@@ -12,6 +12,14 @@ import { Request } from 'express'
 
 @JsonController('/pages')
 export class PageController {
+    // 보안 취약점
+    @Get('/')
+    async getPages (@Req() req: Request) {
+        const service = new PageService(new ViewerAPI(req))
+        const arr = await service.getPageIDList()
+        return makeResponseMessage(200, arr)
+    }
+
     @Get('/:id/summary')
     async getPageSummary (@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request) {
         try {

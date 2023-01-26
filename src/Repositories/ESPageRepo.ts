@@ -43,6 +43,17 @@ class ESUserRepo {
         }
     }
 
+    async getPageIDList () {
+        const documents = await OpenSearch.select('molink-page', {
+            query: {
+                match_all: {}
+            },
+            stored_fields: [],
+            size: 10000
+        })
+        return documents.map((raw: any) => raw._id)
+    }
+
     async getBlogPageSummaryList (blogID: number, maxVisibility: PageVisibility, size: number = 5, from: number = 0) {
         const { total, documents } = await OpenSearch.selectWithTotal('molink-page', {
             sort: [

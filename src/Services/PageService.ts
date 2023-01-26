@@ -12,6 +12,11 @@ export class PageService {
         this.viewerAPI = viewerAPI
     }
 
+    async getPageIDList () {
+        const pageIDList = await ESPageRepo.getPageIDList()
+        return pageIDList
+    }
+
     async getPageSummary (user: User, pageId: string) {
         const authority = await this.viewerAPI.getPageAuthority(pageId)
         if (!authority.viewable) {
@@ -25,27 +30,35 @@ export class PageService {
     }
 
     async getPageMetaInfo (user: User, pageId: string) {
-        const authority = await this.viewerAPI.getPageAuthority(pageId)
-        if (!authority.viewable) {
-            throw new UnauthorizedForPage()
+        try {
+            // const authority = await this.viewerAPI.getPageAuthority(pageId)
+            // if (!authority.viewable) {
+            //     return {}
+            // }
+            const pageMetaInfo = await ESPageRepo.getPageMetaInfo(pageId)
+            if (!pageMetaInfo) {
+                return {}
+            }
+            return pageMetaInfo
+        } catch (err) {
+            return {}
         }
-        const pageMetaInfo = await ESPageRepo.getPageMetaInfo(pageId)
-        if (!pageMetaInfo) {
-            throw new PageNotExists()
-        }
-        return pageMetaInfo
     }
 
     async getEditorPageInfo (user: User, pageId: string) {
-        const authority = await this.viewerAPI.getPageAuthority(pageId)
-        if (!authority.viewable) {
-            throw new UnauthorizedForPage()
+        try {
+            // const authority = await this.viewerAPI.getPageAuthority(pageId)
+            // if (!authority.viewable) {
+            //     throw new UnauthorizedForPage()
+            // }
+            const editorPageInfo = await ESPageRepo.getEditorPageInfo(pageId)
+            if (!editorPageInfo) {
+                throw new PageNotExists()
+            }
+            return editorPageInfo
+        } catch (err) {
+            return {}
         }
-        const editorPageInfo = await ESPageRepo.getEditorPageInfo(pageId)
-        if (!editorPageInfo) {
-            throw new PageNotExists()
-        }
-        return editorPageInfo
     }
 
     async getUserLikePage (user: User, pageId: string) {
