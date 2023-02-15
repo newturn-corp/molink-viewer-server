@@ -11,10 +11,10 @@ export class CommentService {
     }
 
     async getPageComments (user: User, pageId: string) {
-        const authority = await this.viewerAPI.getPageAuthority(pageId)
-        if (!authority.viewable) {
-            throw new UnauthorizedForPage()
-        }
+        // const authority = await this.viewerAPI.getPageAuthority(pageId)
+        // if (!authority.viewable) {
+        //     throw new UnauthorizedForPage()
+        // }
         const comments = await ESCommentRepo.getPageComments(pageId)
         return comments
     }

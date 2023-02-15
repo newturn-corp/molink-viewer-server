@@ -28,4 +28,5 @@ export function useMiddleware (app: express.Application) {
     app.use(morgan(logFormat))
     app.use(userAgent.express())
     useExpressServer(app, routingControllersOptions)
+    const a = 96
 }
